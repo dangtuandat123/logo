@@ -1,109 +1,130 @@
 import { useState, useEffect } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import api from '../services/api'
 import { useAuth } from '../contexts/AuthContext'
 import { useToast } from '../contexts/ToastContext'
-import { Plus, Pencil, Trash2 } from 'lucide-react'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faPlus, faPen, faTrash, faDownload, faWandMagicSparkles, faChevronDown, faChevronUp } from '@fortawesome/free-solid-svg-icons'
 
 export default function DashboardPage() {
-    const { user, refreshUser } = useAuth(); const toast = useToast()
+    const { user, refreshUser } = useAuth(); const toast = useToast(); const navigate = useNavigate()
     const [logos, setLogos] = useState([]); const [loading, setLoading] = useState(true)
-    const [transactions, setTransactions] = useState([]); const [tab, setTab] = useState('logos')
+    const [transactions, setTransactions] = useState([]); const [txLoading, setTxLoading] = useState(true)
+    const [activeTab, setActiveTab] = useState('logos')
 
-    useEffect(() => { loadData() }, [])
-    const loadData = async () => {
-        try { const [l, t] = await Promise.all([api.get('/logos'), api.get('/wallet/transactions')]); setLogos(l.data.data.data || []); setTransactions(t.data.data.data || []); await refreshUser() }
-        catch (e) { toast.error('Lỗi tải dữ liệu.') } finally { setLoading(false) }
-    }
-    const del = async (id) => {
-        if (!confirm('Xóa logo này?')) return
-        try { await api.delete(`/logos/${id}`); setLogos(p => p.filter(l => l.id !== id)); toast.success('Đã xóa.') }
-        catch (e) { toast.error('Lỗi xóa.') }
+    useEffect(() => { fetchLogos(); fetchTransactions() }, [])
+
+    const fetchLogos = async () => {
+        try { const r = await api.get('/logos'); setLogos(r.data.data) }
+        catch (e) { toast.error('Không tải được danh sách logo.') }
+        finally { setLoading(false) }
     }
 
-    const tabStyle = (a) => ({ padding: '8px 18px', borderRadius: '10px', fontSize: '13px', fontWeight: 500, background: a ? 'rgba(59,130,246,0.15)' : 'transparent', border: 'none', color: a ? '#60a5fa' : 'rgba(255,255,255,0.5)', cursor: 'pointer', fontFamily: 'var(--font-sans)', transition: 'all 0.15s' })
+    const fetchTransactions = async () => {
+        try { const r = await api.get('/wallet/history'); setTransactions(r.data.data) }
+        catch (e) { console.error(e) }
+        finally { setTxLoading(false) }
+    }
+
+    const handleDelete = async (id) => {
+        if (!window.confirm('Xóa logo này vĩnh viễn?')) return
+        try { await api.delete(`/logos/${id}`); toast.success('Đã xóa thành công'); fetchLogos() }
+        catch (e) { toast.error('Lỗi khi xóa logo') }
+    }
+
+    const handleDownload = async (l) => {
+        if (user.balance < 50000) { toast.error('Số dư không đủ. Vui lòng nạp thêm.'); navigate('/pricing'); return }
+        if (!window.confirm('Tải file chất lượng cao sẽ trừ 50,000đ. Tiếp tục?')) return
+        try {
+            await api.post(`/wallet/deduct`, { amount: 50000, description: `Tải logo #${l.id} chất lượng cao` })
+            await refreshUser(); toast.success('Đã nâng cấp chất lượng!')
+            const blob = new Blob([l.svg_content], { type: 'image/svg+xml' })
+            const url = URL.createObjectURL(blob)
+            const a = document.createElement('a'); a.href = url; a.download = `logo-${l.id}-premium.svg`; a.click()
+            URL.revokeObjectURL(url)
+        } catch (e) { toast.error('Giao dịch lỗi. Không trừ tiền.') }
+    }
 
     return (
-        <div style={{ padding: '32px 24px' }}>
-            <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
-                {/* Header */}
-                <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', gap: '16px', marginBottom: '32px' }}>
-                    <div>
-                        <h1 style={{ fontSize: '24px', fontWeight: 700 }}>Dashboard</h1>
-                        <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '14px', marginTop: '4px' }}>Xin chào, {user?.name}!</p>
-                    </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                        <div className="glass-card" style={{ padding: '10px 18px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                            <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.4)' }}>Số dư</span>
-                            <span style={{ fontSize: '18px', fontWeight: 700, background: 'linear-gradient(135deg,#3b82f6,#a855f7)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>{Number(user?.balance || 0).toLocaleString('vi-VN')}đ</span>
-                        </div>
-                        <Link to="/onboarding" className="btn-primary" style={{ padding: '10px 20px' }}><Plus size={16} /> Tạo Logo</Link>
-                    </div>
+        <div style={{ padding: '32px 24px', maxWidth: '1200px', margin: '0 auto', paddingBottom: '100px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '40px', flexWrap: 'wrap', gap: '20px' }}>
+                <div className="animate-slide-up">
+                    <h1 style={{ fontSize: '32px', fontWeight: 800, marginBottom: '8px', letterSpacing: '-0.5px' }}>
+                        Chào mừng, <span style={{ color: 'var(--color-ocean-primary)' }}>{user?.name}</span>
+                    </h1>
+                    <p style={{ color: 'var(--color-ocean-text-muted)', fontSize: '15px' }}>Đây là trạm lưu trữ các ý tưởng sáng tạo của bạn.</p>
                 </div>
+                <Link to="/onboarding" className="btn-ocean animate-slide-up" style={{ padding: '12px 24px', animationDelay: '0.1s' }}>
+                    <FontAwesomeIcon icon={faPlus} /> Khởi tạo Logo mới
+                </Link>
+            </div>
 
-                {/* Tabs */}
-                <div style={{ display: 'inline-flex', gap: '4px', padding: '4px', background: 'rgba(255,255,255,0.03)', borderRadius: '14px', border: '1px solid rgba(255,255,255,0.05)', marginBottom: '28px' }}>
-                    <button onClick={() => setTab('logos')} style={tabStyle(tab === 'logos')}>🎨 Logo của tôi</button>
-                    <button onClick={() => setTab('tx')} style={tabStyle(tab === 'tx')}>💰 Giao dịch</button>
-                </div>
+            <div className="ocean-card animate-slide-up" style={{ padding: '8px', display: 'flex', gap: '8px', marginBottom: '32px', width: 'fit-content', animationDelay: '0.2s' }}>
+                <button onClick={() => setActiveTab('logos')} style={{ padding: '10px 24px', borderRadius: '12px', border: 'none', background: activeTab === 'logos' ? 'var(--color-ocean-primary)' : 'transparent', color: activeTab === 'logos' ? 'var(--color-ocean-bg)' : 'var(--color-ocean-text)', fontWeight: 600, fontSize: '14px', cursor: 'pointer', transition: 'all 0.2s' }}>Bộ Sưu Tập</button>
+                <button onClick={() => setActiveTab('transactions')} style={{ padding: '10px 24px', borderRadius: '12px', border: 'none', background: activeTab === 'transactions' ? 'var(--color-ocean-primary)' : 'transparent', color: activeTab === 'transactions' ? 'var(--color-ocean-bg)' : 'var(--color-ocean-text)', fontWeight: 600, fontSize: '14px', cursor: 'pointer', transition: 'all 0.2s' }}>Lịch Sử Giao Dịch</button>
+            </div>
 
-                {loading ? (
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(280px,1fr))', gap: '16px' }}>
-                        {[1, 2, 3].map(i => <div key={i} className="glass-card"><div className="skeleton" style={{ height: '160px', marginBottom: '16px' }} /><div className="skeleton" style={{ height: '20px', width: '70%', marginBottom: '8px' }} /><div className="skeleton" style={{ height: '16px', width: '50%' }} /></div>)}
-                    </div>
-                ) : tab === 'logos' ? (
-                    logos.length === 0 ? (
-                        <div style={{ textAlign: 'center', padding: '80px 24px' }}>
-                            <div style={{ width: '80px', height: '80px', margin: '0 auto 24px', borderRadius: '24px', background: 'rgba(59,130,246,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '36px' }}>🎨</div>
-                            <h3 style={{ fontSize: '18px', fontWeight: 600, marginBottom: '8px' }}>Chưa có logo</h3>
-                            <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '14px', marginBottom: '24px' }}>Tạo logo đầu tiên ngay!</p>
-                            <Link to="/onboarding" className="btn-primary">Tạo Logo</Link>
+            {activeTab === 'logos' && (
+                <div className="animate-slide-up" style={{ animationDelay: '0.3s' }}>
+                    {loading ? (
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '24px' }}>
+                            {[1, 2, 3].map(i => <div key={i} className="skeleton" style={{ height: '300px' }} />)}
                         </div>
-                    ) : (
-                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(280px,1fr))', gap: '16px' }}>
+                    ) : logos.length > 0 ? (
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '24px' }}>
                             {logos.map(l => (
-                                <div key={l.id} style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '16px', overflow: 'hidden' }}>
-                                    <div style={{ aspectRatio: '4/3', background: 'rgba(255,255,255,0.02)', padding: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderBottom: '1px solid rgba(255,255,255,0.05)' }} dangerouslySetInnerHTML={{ __html: l.svg_content || '<svg></svg>' }} />
-                                    <div style={{ padding: '16px' }}>
-                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                                            <h3 style={{ fontSize: '14px', fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{l.name}</h3>
-                                            <span className="badge" style={{ background: l.status === 'completed' ? 'rgba(34,197,94,0.15)' : 'rgba(255,255,255,0.05)', color: l.status === 'completed' ? '#22c55e' : 'rgba(255,255,255,0.4)', fontSize: '11px' }}>{l.status === 'completed' ? 'Done' : 'Nháp'}</span>
-                                        </div>
-                                        <p style={{ fontSize: '12px', color: 'rgba(255,255,255,0.4)', marginBottom: '12px' }}>{l.industry} · {l.style}</p>
-                                        <div style={{ display: 'flex', gap: '8px' }}>
-                                            <Link to={`/editor/${l.id}`} className="btn-glass" style={{ flex: 1, padding: '8px', fontSize: '12px', textAlign: 'center' }}><Pencil size={14} /> Sửa</Link>
-                                            <button onClick={() => del(l.id)} className="btn-danger" style={{ padding: '8px 12px', fontSize: '12px' }}><Trash2 size={14} /></button>
-                                        </div>
+                                <div key={l.id} className="ocean-card" style={{ padding: '20px', display: 'flex', flexDirection: 'column' }}>
+                                    <div style={{ width: '100%', aspectRatio: '1', background: 'rgba(235,244,246,0.03)', borderRadius: '16px', border: '1px dashed rgba(235,244,246,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '16px', position: 'relative', overflow: 'hidden' }} dangerouslySetInnerHTML={{ __html: l.svg_content }} />
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                                        <span className="ocean-badge">{l.industry}</span>
+                                        <span style={{ fontSize: '13px', color: 'var(--color-ocean-text-muted)', fontWeight: 500 }}>{new Date(l.created_at).toLocaleDateString('vi-VN')}</span>
+                                    </div>
+                                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr auto', gap: '8px', marginTop: 'auto' }}>
+                                        <button onClick={() => navigate(`/editor/${l.id}`)} className="btn-ocean-ghost" style={{ padding: '10px' }} title="Chỉnh sửa"><FontAwesomeIcon icon={faPen} /></button>
+                                        <button onClick={() => handleDownload(l)} className="btn-ocean" style={{ padding: '10px', fontSize: '14px' }} title="Tải HD"><FontAwesomeIcon icon={faDownload} /> HD</button>
+                                        <button onClick={() => handleDelete(l.id)} className="btn-ocean-danger"><FontAwesomeIcon icon={faTrash} /></button>
                                     </div>
                                 </div>
                             ))}
                         </div>
-                    )
-                ) : (
-                    transactions.length === 0 ? (
-                        <div style={{ textAlign: 'center', padding: '80px 24px' }}>
-                            <div style={{ width: '80px', height: '80px', margin: '0 auto 24px', borderRadius: '24px', background: 'rgba(59,130,246,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '36px' }}>💰</div>
-                            <h3 style={{ fontSize: '18px', fontWeight: 600, marginBottom: '8px' }}>Chưa có giao dịch</h3>
-                            <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '14px' }}>Giao dịch sẽ hiển thị ở đây.</p>
+                    ) : (
+                        <div className="ocean-card" style={{ padding: '64px 20px', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                            <div style={{ width: '80px', height: '80px', borderRadius: '24px', background: 'rgba(122,178,178,0.1)', color: 'var(--color-ocean-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '32px', marginBottom: '24px' }}><FontAwesomeIcon icon={faWandMagicSparkles} /></div>
+                            <h3 style={{ fontSize: '20px', fontWeight: 700, marginBottom: '8px' }}>Kho lưu trữ trống</h3>
+                            <p style={{ color: 'var(--color-ocean-text-muted)', fontSize: '15px', marginBottom: '24px' }}>Bắt đầu bằng cách giao cho AI thiết kế logo đầu tiên của bạn.</p>
+                            <Link to="/onboarding" className="btn-ocean" style={{ padding: '12px 32px' }}><FontAwesomeIcon icon={faPlus} /> Khởi tạo logo</Link>
+                        </div>
+                    )}
+                </div>
+            )}
+
+            {activeTab === 'transactions' && (
+                <div className="ocean-card animate-slide-up">
+                    {txLoading ? (
+                        <div className="skeleton" style={{ height: '400px' }} />
+                    ) : transactions.length > 0 ? (
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '12px' }}>
+                            <div style={{ display: 'grid', gridTemplateColumns: '120px 1fr 150px', padding: '16px 20px', borderBottom: '1px solid rgba(235,244,246,0.1)', color: 'var(--color-ocean-text-muted)', fontSize: '13px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                                <span>Thời gian</span><span>Nội dung giao dịch</span><span style={{ textAlign: 'right' }}>Thay đổi</span>
+                            </div>
+                            {transactions.map(t => (
+                                <div key={t.id} style={{ display: 'grid', gridTemplateColumns: '120px 1fr 150px', padding: '16px 20px', alignItems: 'center', background: 'rgba(235,244,246,0.02)', borderRadius: '12px', border: '1px solid rgba(235,244,246,0.05)' }}>
+                                    <span style={{ fontSize: '14px', color: 'var(--color-ocean-text-muted)' }}>{new Date(t.created_at).toLocaleDateString('vi-VN')}</span>
+                                    <span style={{ fontSize: '15px', fontWeight: 500 }}>{t.description}</span>
+                                    <span style={{ textAlign: 'right', fontWeight: 800, color: t.type === 'deposit' ? 'var(--color-ocean-primary)' : '#fca5a5' }}>
+                                        <FontAwesomeIcon icon={t.type === 'deposit' ? faChevronUp : faChevronDown} style={{ fontSize: '12px', marginRight: '6px' }} />
+                                        {Number(Math.abs(t.amount)).toLocaleString('vi-VN')}đ
+                                    </span>
+                                </div>
+                            ))}
                         </div>
                     ) : (
-                        <div className="glass-card" style={{ padding: 0, overflow: 'hidden' }}>
-                            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                                <thead><tr style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-                                    {['Thời gian', 'Loại', 'Mô tả', 'Số tiền', 'Số dư'].map(h => <th key={h} style={{ textAlign: h === 'Số tiền' || h === 'Số dư' ? 'right' : 'left', padding: '14px 20px', fontSize: '11px', fontWeight: 600, color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{h}</th>)}
-                                </tr></thead>
-                                <tbody>{transactions.map(t => <tr key={t.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.03)' }}>
-                                    <td style={{ padding: '14px 20px', fontSize: '13px', color: 'rgba(255,255,255,0.5)' }}>{new Date(t.created_at).toLocaleDateString('vi-VN')}</td>
-                                    <td style={{ padding: '14px 20px' }}><span className="badge" style={{ background: t.type === 'deposit' ? 'rgba(34,197,94,0.15)' : 'rgba(239,68,68,0.15)', color: t.type === 'deposit' ? '#22c55e' : '#f87171', fontSize: '11px' }}>{t.type === 'deposit' ? '↑ Nạp' : '↓ Trừ'}</span></td>
-                                    <td style={{ padding: '14px 20px', fontSize: '13px' }}>{t.description}</td>
-                                    <td style={{ padding: '14px 20px', fontSize: '13px', textAlign: 'right', fontWeight: 600, color: t.type === 'deposit' ? '#22c55e' : '#f87171' }}>{t.type === 'deposit' ? '+' : '-'}{Number(t.amount).toLocaleString('vi-VN')}đ</td>
-                                    <td style={{ padding: '14px 20px', fontSize: '13px', textAlign: 'right', color: 'rgba(255,255,255,0.4)' }}>{Number(t.balance_after).toLocaleString('vi-VN')}đ</td>
-                                </tr>)}</tbody>
-                            </table>
+                        <div style={{ padding: '64px 20px', textAlign: 'center', color: 'var(--color-ocean-text-muted)' }}>
+                            Chưa có giao dịch lịch sử nào.
                         </div>
-                    )
-                )}
-            </div>
+                    )}
+                </div>
+            )}
         </div>
     )
 }

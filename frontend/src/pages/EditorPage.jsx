@@ -1,77 +1,122 @@
 import { useState, useEffect } from 'react'
-import { useParams, useNavigate, Link } from 'react-router-dom'
+import { useParams, useNavigate } from 'react-router-dom'
 import api from '../services/api'
 import { useToast } from '../contexts/ToastContext'
-import { ChevronLeft, Save, Download } from 'lucide-react'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faChevronLeft, faFloppyDisk, faDownload, faPalette, faFont, faLayerGroup, faWandMagicSparkles } from '@fortawesome/free-solid-svg-icons'
 
 export default function EditorPage() {
-    const { id } = useParams(); const navigate = useNavigate(); const toast = useToast()
-    const [logo, setLogo] = useState(null); const [loading, setLoading] = useState(true); const [saving, setSaving] = useState(false)
-    const [editName, setEditName] = useState(''); const [editSlogan, setEditSlogan] = useState('')
-    const [editColors, setEditColors] = useState([]); const [svgContent, setSvgContent] = useState('')
+    const { id } = useParams()
+    const navigate = useNavigate()
+    const toast = useToast()
 
-    useEffect(() => { loadLogo() }, [id])
-    const loadLogo = async () => {
-        try { const r = await api.get(`/logos/${id}`); const d = r.data.data.logo; setLogo(d); setEditName(d.name || ''); setEditSlogan(d.slogan || ''); setEditColors(d.colors || []); setSvgContent(d.svg_content || '') }
-        catch { toast.error('Không tìm thấy logo.'); navigate('/dashboard') } finally { setLoading(false) }
-    }
+    const [logo, setLogo] = useState(null)
+    const [loading, setLoading] = useState(true)
+    const [saving, setSaving] = useState(false)
+    const [settings, setSettings] = useState({ color: '#ffffff', scale: 100, rotate: 0 })
+
+    useEffect(() => {
+        const fetchLogo = async () => {
+            try { const r = await api.get(`/logos/${id}`); setLogo(r.data.data) }
+            catch (e) { toast.error('Không tìm thấy bản thiết kế'); navigate('/dashboard') }
+            finally { setLoading(false) }
+        }
+        fetchLogo()
+        // eslint-disable-next-line
+    }, [id])
+
     const handleSave = async () => {
         setSaving(true)
-        try { await api.put(`/logos/${id}`, { name: editName, slogan: editSlogan, svg_content: svgContent, colors: editColors, status: 'completed' }); toast.success('Đã lưu!') }
-        catch { toast.error('Lỗi lưu.') } finally { setSaving(false) }
+        try { await api.put(`/logos/${id}`, { svg_content: logo.svg_content, settings }); toast.success('Đã lưu thiết kế!') }
+        catch (e) { toast.error('Lỗi lưu trữ.') }
+        finally { setSaving(false) }
     }
-    const esc = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-    const changeColor = (o, n) => { setSvgContent(p => p.replace(new RegExp(esc(o), 'gi'), n)); setEditColors(p => p.map(c => c.toLowerCase() === o.toLowerCase() ? n : c)) }
-    const downloadSvg = () => { const b = new Blob([svgContent], { type: 'image/svg+xml' }); const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = `${editName || 'logo'}.svg`; a.click(); toast.success('Đã tải SVG!') }
-    const downloadPng = () => { const cv = document.createElement('canvas'); cv.width = 800; cv.height = 600; const ctx = cv.getContext('2d'); const img = new Image(); const u = URL.createObjectURL(new Blob([svgContent], { type: 'image/svg+xml;charset=utf-8' })); img.onload = () => { ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, 800, 600); ctx.drawImage(img, 0, 0, 800, 600); cv.toBlob(b => { const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = `${editName || 'logo'}.png`; a.click() }); URL.revokeObjectURL(u); toast.success('Đã tải PNG!') }; img.src = u }
 
-    if (loading) return <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><div style={{ width: '48px', height: '48px', border: '3px solid rgba(255,255,255,0.1)', borderTopColor: '#3b82f6', borderRadius: '50%', animation: 'spin 1s linear infinite' }} /></div>
+    const handleBasicDownload = () => {
+        const blob = new Blob([logo.svg_content], { type: 'image/svg+xml' })
+        const url = URL.createObjectURL(blob)
+        const a = document.createElement('a'); a.href = url; a.download = `logo-draft-${id}.svg`; a.click()
+        URL.revokeObjectURL(url)
+    }
+
+    if (loading) return (
+        <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--color-ocean-bg)' }}>
+            <div className="skeleton" style={{ width: '200px', height: '200px', borderRadius: '50%' }} />
+        </div>
+    )
 
     return (
-        <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', background: 'var(--color-dark-950)' }}>
-            {/* Top Bar */}
-            <div style={{ background: 'rgba(15,15,24,0.8)', backdropFilter: 'blur(20px)', borderBottom: '1px solid rgba(255,255,255,0.05)', padding: '12px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                    <Link to="/dashboard" style={{ padding: '8px', borderRadius: '10px', display: 'flex', textDecoration: 'none', color: 'rgba(255,255,255,0.6)' }}><ChevronLeft size={20} /></Link>
-                    <input type="text" value={editName} onChange={e => setEditName(e.target.value)} style={{ fontSize: '17px', fontWeight: 600, border: 'none', outline: 'none', background: 'transparent', fontFamily: 'var(--font-sans)', color: 'rgba(255,255,255,0.95)', minWidth: '200px' }} placeholder="Tên logo" />
-                </div>
-                <div style={{ display: 'flex', gap: '8px' }}>
-                    <button onClick={handleSave} disabled={saving} className="btn-glass" style={{ padding: '8px 18px', fontSize: '13px' }}><Save size={14} /> {saving ? 'Lưu...' : 'Lưu'}</button>
-                    <button onClick={downloadSvg} className="btn-glass" style={{ padding: '8px 18px', fontSize: '13px' }}><Download size={14} /> SVG</button>
-                    <button onClick={downloadPng} className="btn-primary" style={{ padding: '8px 18px', fontSize: '13px' }}><Download size={14} /> PNG</button>
-                </div>
-            </div>
-            <div style={{ display: 'flex', flex: 1, minHeight: 0 }}>
-                {/* Canvas */}
-                <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '32px' }}>
-                    <div className="glass-card" style={{ width: '100%', maxWidth: '640px', aspectRatio: '4/3', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '32px' }}>
-                        <div style={{ width: '100%', height: '100%' }} dangerouslySetInnerHTML={{ __html: svgContent }} />
+        <div style={{ height: '100vh', display: 'flex', background: 'var(--color-ocean-bg)', overflow: 'hidden' }}>
+            {/* Sidebar Controls */}
+            <aside className="ocean-glass" style={{ width: '320px', height: '100vh', borderRight: '1px solid var(--color-ocean-border)', display: 'flex', flexDirection: 'column', zIndex: 10 }}>
+                <div style={{ padding: '20px', borderBottom: '1px solid var(--color-ocean-border)', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    <button onClick={() => navigate('/dashboard')} style={{ background: 'transparent', border: '1px solid var(--color-ocean-border)', color: 'var(--color-ocean-text)', width: '36px', height: '36px', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', transition: 'all 0.2s' }}>
+                        <FontAwesomeIcon icon={faChevronLeft} />
+                    </button>
+                    <div style={{ flex: 1 }}>
+                        <h2 style={{ fontSize: '16px', fontWeight: 700, margin: 0 }}>Studio Thiết Kế</h2>
+                        <p style={{ fontSize: '12px', color: 'var(--color-ocean-text-muted)' }}>Chế độ Beta</p>
                     </div>
                 </div>
-                {/* Panel */}
-                <div style={{ width: '300px', background: 'rgba(15,15,24,0.6)', backdropFilter: 'blur(12px)', borderLeft: '1px solid rgba(255,255,255,0.05)', padding: '24px', display: 'flex', flexDirection: 'column', gap: '24px', overflowY: 'auto' }} className="hidden md:flex">
+
+                <div style={{ flex: 1, overflowY: 'auto', padding: '24px', display: 'flex', flexDirection: 'column', gap: '32px' }}>
+                    {/* Tools */}
                     <div>
-                        <h3 style={{ fontSize: '13px', fontWeight: 600, color: 'rgba(255,255,255,0.5)', marginBottom: '12px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Văn bản</h3>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                            <div><label style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', marginBottom: '4px', display: 'block' }}>Tên</label><input type="text" value={editName} onChange={e => setEditName(e.target.value)} className="glass-input" style={{ padding: '10px 14px' }} /></div>
-                            <div><label style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', marginBottom: '4px', display: 'block' }}>Tagline</label><input type="text" value={editSlogan} onChange={e => setEditSlogan(e.target.value)} className="glass-input" style={{ padding: '10px 14px' }} /></div>
+                        <h3 style={{ fontSize: '14px', fontWeight: 700, color: 'var(--color-ocean-text-muted)', marginBottom: '16px', textTransform: 'uppercase', letterSpacing: '1px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <FontAwesomeIcon icon={faPalette} /> Màu sắc chủ đạo
+                        </h3>
+                        <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+                            <input type="color" value={settings.color} onChange={e => setSettings({ ...settings, color: e.target.value })} style={{ width: '48px', height: '48px', borderRadius: '12px', border: '2px solid rgba(235,244,246,0.1)', background: 'transparent', cursor: 'pointer', padding: '4px' }} />
+                            <span style={{ fontSize: '14px', fontWeight: 600, color: 'var(--color-ocean-text)', padding: '8px 12px', background: 'rgba(235,244,246,0.05)', borderRadius: '8px', border: '1px solid rgba(235,244,246,0.1)' }}>{settings.color.toUpperCase()}</span>
                         </div>
                     </div>
+
                     <div>
-                        <h3 style={{ fontSize: '13px', fontWeight: 600, color: 'rgba(255,255,255,0.5)', marginBottom: '12px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Bảng màu</h3>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                            {editColors.map((c, i) => <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '8px', background: 'rgba(255,255,255,0.03)', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.05)' }}>
-                                <input type="color" value={c} onChange={e => changeColor(c, e.target.value)} style={{ width: '36px', height: '36px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', cursor: 'pointer', padding: '2px', background: 'transparent' }} />
-                                <span style={{ fontSize: '12px', fontFamily: 'monospace', color: 'rgba(255,255,255,0.4)', flex: 1 }}>{c.toUpperCase()}</span>
-                            </div>)}
-                        </div>
+                        <h3 style={{ fontSize: '14px', fontWeight: 700, color: 'var(--color-ocean-text-muted)', marginBottom: '16px', textTransform: 'uppercase', letterSpacing: '1px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <FontAwesomeIcon icon={faLayerGroup} /> Biến dạng kích thước
+                        </h3>
+                        <input type="range" min="50" max="200" value={settings.scale} onChange={e => setSettings({ ...settings, scale: parseInt(e.target.value) })} style={{ width: '100%', accentColor: 'var(--color-ocean-primary)' }} />
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '8px', fontSize: '12px', color: 'var(--color-ocean-text-muted)' }}><span>50%</span><span>{settings.scale}%</span><span>200%</span></div>
                     </div>
-                    <div style={{ marginTop: 'auto', paddingTop: '16px', borderTop: '1px solid rgba(255,255,255,0.05)', display: 'flex', flexDirection: 'column', gap: '4px', fontSize: '12px', color: 'rgba(255,255,255,0.4)' }}>
-                        <span>Phong cách: <strong style={{ color: 'rgba(255,255,255,0.7)' }}>{logo?.style}</strong></span>
-                        <span>Ngành: <strong style={{ color: 'rgba(255,255,255,0.7)' }}>{logo?.industry}</strong></span>
+
+                    <div>
+                        <h3 style={{ fontSize: '14px', fontWeight: 700, color: 'var(--color-ocean-text-muted)', marginBottom: '16px', textTransform: 'uppercase', letterSpacing: '1px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <FontAwesomeIcon icon={faWandMagicSparkles} /> Xoay định hướng
+                        </h3>
+                        <input type="range" min="0" max="360" value={settings.rotate} onChange={e => setSettings({ ...settings, rotate: parseInt(e.target.value) })} style={{ width: '100%', accentColor: 'var(--color-ocean-primary)' }} />
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '8px', fontSize: '12px', color: 'var(--color-ocean-text-muted)' }}><span>0°</span><span>{settings.rotate}°</span><span>360°</span></div>
                     </div>
                 </div>
-            </div>
+
+                <div style={{ padding: '24px', borderTop: '1px solid var(--color-ocean-border)', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                    <button onClick={handleSave} disabled={saving} className="btn-ocean" style={{ width: '100%' }}>
+                        <FontAwesomeIcon icon={faFloppyDisk} /> {saving ? 'Đang lưu...' : 'Lưu Bản Nháp'}
+                    </button>
+                    <button onClick={handleBasicDownload} className="btn-ocean-ghost" style={{ width: '100%' }}>
+                        <FontAwesomeIcon icon={faDownload} /> Tải định dạng nháp
+                    </button>
+                </div>
+            </aside>
+
+            {/* Main Preview Area */}
+            <main style={{ flex: 1, position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '40px' }}>
+                <div style={{
+                    position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, opacity: 0.05, pointerEvents: 'none',
+                    backgroundImage: 'radial-gradient(circle at 2px 2px, rgba(235,244,246,1) 1px, transparent 0)', backgroundSize: '32px 32px'
+                }} />
+
+                <div className="ocean-card" style={{ width: '100%', maxWidth: '800px', aspectRatio: '1', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(8,131,149,0.1)', overflow: 'hidden' }}>
+                    <div
+                        style={{
+                            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                            transform: `scale(${settings.scale / 100}) rotate(${settings.rotate}deg)`,
+                            width: '80%', height: '80%',
+                            display: 'flex', alignItems: 'center', justifyContent: 'center'
+                        }}
+                        dangerouslySetInnerHTML={{ __html: logo?.svg_content.replace(/currentColor|#\w{3,6}/gi, settings.color) }}
+                    />
+                </div>
+            </main>
         </div>
     )
 }

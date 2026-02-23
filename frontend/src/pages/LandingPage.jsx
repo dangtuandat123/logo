@@ -1,75 +1,71 @@
 import { Link } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
-import { Zap, Palette, PenTool, Shield, Star, DollarSign } from 'lucide-react'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faBolt, faPalette, faPenNib, faShieldHalved, faStar, faDollarSign } from '@fortawesome/free-solid-svg-icons'
 
 export default function LandingPage() {
     const { user } = useAuth()
     const features = [
-        { icon: Zap, title: 'Nhanh chóng', desc: 'AI tạo logo trong vài giây. Không cần kỹ năng thiết kế.' },
-        { icon: Palette, title: 'Tùy chỉnh', desc: 'Chỉnh sửa text, màu sắc, font chữ ngay trên trình duyệt.' },
-        { icon: PenTool, title: 'SVG Vector', desc: 'Xuất file SVG chất lượng vô hạn, sắc nét mọi kích thước.' },
-        { icon: Star, title: 'Nhiều phong cách', desc: 'Minimalist, Artisan, Mascot, Typography đa dạng.' },
-        { icon: Shield, title: 'Bảo mật', desc: 'Dữ liệu được lưu trữ an toàn, chỉ bạn có quyền truy cập.' },
-        { icon: DollarSign, title: 'Giá hợp lý', desc: 'Dùng thử miễn phí. Tải bản HD với giá phải chăng.' },
+        { icon: faBolt, title: 'Nhanh xuất thần', desc: 'Công nghệ AI mạnh mẽ tạo ra hàng chục ý tưởng thiết kế chỉ trong thời gian bạn ngáp một cái.' },
+        { icon: faPalette, title: 'Tùy biến đa dạng', desc: 'Dễ dàng thay đổi màu sắc, font chữ và bố cục. Creative freedom hoàn toàn trong tay bạn.' },
+        { icon: faPenNib, title: 'Chuẩn Vector SVG', desc: 'Xuất file chuẩn in ấn. Phóng to thoải mái không bao giờ lo vỡ nét hay mờ nhòe.' },
+        { icon: faStar, title: 'Phong cách độc bản', desc: 'Từ Minimalist tinh tế đến Mascot nghịch ngợm. AI học hỏi các xu hướng thiết kế mới nhất toàn cầu.' },
+        { icon: faShieldHalved, title: 'Bảo mật tuyệt đối', desc: 'Dữ liệu thương hiệu của bạn được mã hóa và bảo vệ an toàn trên nền tảng đám mây.' },
+        { icon: faDollarSign, title: 'Đầu tư thông minh', desc: 'Bắt đầu hoàn toàn miễn phí. Chỉ thanh toán khi bạn thực sự hài lòng với thiết kế cuối cùng.' },
     ]
 
     return (
-        <div style={{ paddingTop: '64px' }}>
-            {/* Hero */}
-            <section style={{ padding: '100px 24px 80px', textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
-                {/* Glow orbs */}
-                <div style={{ position: 'absolute', top: '-200px', left: '50%', transform: 'translateX(-50%)', width: '600px', height: '600px', background: 'radial-gradient(circle, rgba(59,130,246,0.12) 0%, transparent 70%)', pointerEvents: 'none' }} />
-                <div style={{ position: 'absolute', top: '-100px', right: '-200px', width: '400px', height: '400px', background: 'radial-gradient(circle, rgba(168,85,247,0.08) 0%, transparent 70%)', pointerEvents: 'none' }} />
-                <div style={{ position: 'relative', maxWidth: '700px', margin: '0 auto' }}>
-                    <span className="badge animate-fade-in" style={{ background: 'rgba(59,130,246,0.15)', color: '#60a5fa', marginBottom: '24px', display: 'inline-flex' }}>✨ Powered by AI</span>
-                    <h1 style={{ fontSize: 'clamp(36px, 5vw, 60px)', fontWeight: 800, lineHeight: 1.1, marginBottom: '20px' }} className="animate-fade-in">
-                        Tạo Logo Chuyên Nghiệp
+        <div>
+            {/* Hero Section */}
+            <section style={{ padding: '80px 24px', textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
+                <div className="animate-float" style={{ position: 'absolute', top: '20px', left: '10%', width: '300px', height: '300px', background: 'radial-gradient(circle, rgba(122,178,178,0.2) 0%, transparent 70%)', pointerEvents: 'none' }} />
+                <div style={{ position: 'relative', maxWidth: '800px', margin: '0 auto', zIndex: 10 }}>
+                    <span className="ocean-badge animate-slide-up" style={{ marginBottom: '32px' }}>✨ Trí tuệ thiết kế tương lai</span>
+                    <h1 className="animate-slide-up" style={{ fontSize: 'clamp(40px, 6vw, 72px)', fontWeight: 800, lineHeight: 1.1, marginBottom: '24px', letterSpacing: '-1px' }}>
+                        Biến Ý Tưởng Thành
                         <br />
-                        <span style={{ background: 'linear-gradient(135deg, #3b82f6, #a855f7, #ec4899)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Chỉ Trong Vài Giây</span>
+                        <span style={{ color: 'var(--color-ocean-primary)' }}>Logo Độc Bản</span>
                     </h1>
-                    <p style={{ fontSize: '17px', color: 'rgba(255,255,255,0.6)', maxWidth: '540px', margin: '0 auto 36px', lineHeight: 1.7 }} className="animate-fade-in">
-                        Sử dụng trí tuệ nhân tạo để thiết kế logo SVG vector chất lượng cao. Tùy chỉnh phong cách, màu sắc — tải xuống ngay lập tức.
+                    <p className="animate-slide-up" style={{ fontSize: '18px', color: 'var(--color-ocean-text-muted)', maxWidth: '600px', margin: '0 auto 40px', lineHeight: 1.6, animationDelay: '0.1s' }}>
+                        Nâng tầm thương hiệu của bạn với công cụ AI thiết kế logo đỉnh cao. Không cần kinh nghiệm, chỉ cần vài giây để sở hữu bộ nhận diện thương hiệu chuyên nghiệp.
                     </p>
-                    <div style={{ display: 'flex', gap: '14px', justifyContent: 'center', flexWrap: 'wrap' }} className="animate-fade-in">
-                        <Link to={user ? '/onboarding' : '/register'} className="btn-primary" style={{ padding: '14px 36px', fontSize: '15px' }}>Bắt đầu miễn phí</Link>
-                        <Link to="/pricing" className="btn-glass" style={{ padding: '14px 36px', fontSize: '15px' }}>Xem bảng giá</Link>
+                    <div className="animate-slide-up" style={{ display: 'flex', gap: '16px', justifyContent: 'center', flexWrap: 'wrap', animationDelay: '0.2s' }}>
+                        <Link to={user ? '/onboarding' : '/register'} className="btn-ocean" style={{ padding: '16px 40px', fontSize: '16px' }}>Khởi tạo ngay</Link>
+                        <Link to="/pricing" className="btn-ocean-ghost" style={{ padding: '16px 40px', fontSize: '16px' }}>Bảng giá IP</Link>
                     </div>
                 </div>
             </section>
 
-            {/* Features */}
-            <section style={{ padding: '80px 24px', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
-                <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
-                    <h2 style={{ fontSize: '28px', fontWeight: 700, textAlign: 'center', marginBottom: '12px' }}>Tại sao chọn Logo Master?</h2>
-                    <p style={{ textAlign: 'center', color: 'rgba(255,255,255,0.5)', marginBottom: '48px', maxWidth: '480px', margin: '0 auto 48px' }}>Công cụ tạo logo AI mạnh mẽ nhất</p>
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '16px' }}>
-                        {features.map((f, i) => {
-                            const Icon = f.icon
-                            return (
-                                <div key={i} className="glass-card" style={{ display: 'flex', flexDirection: 'column', gap: '14px', transition: 'all 0.2s', cursor: 'default' }}>
-                                    <div style={{ width: '44px', height: '44px', borderRadius: '12px', background: 'rgba(59,130,246,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                        <Icon size={22} color="#60a5fa" />
-                                    </div>
-                                    <h3 style={{ fontSize: '16px', fontWeight: 600 }}>{f.title}</h3>
-                                    <p style={{ fontSize: '14px', color: 'rgba(255,255,255,0.5)', lineHeight: 1.6 }}>{f.desc}</p>
+            {/* Features Showcase */}
+            <section style={{ padding: '80px 24px', position: 'relative' }}>
+                <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
+                    <div style={{ textAlign: 'center', marginBottom: '64px' }}>
+                        <h2 style={{ fontSize: '36px', fontWeight: 800, marginBottom: '16px' }}>Sức mạnh của Logo Master</h2>
+                        <p style={{ color: 'var(--color-ocean-text-muted)', fontSize: '16px', maxWidth: '500px', margin: '0 auto' }}>Tại sao hàng ngàn startup và doanh nghiệp tin tưởng giải pháp thiết kế của chúng tôi?</p>
+                    </div>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '24px' }}>
+                        {features.map((f, i) => (
+                            <div key={i} className="ocean-card" style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                                <div style={{ width: '56px', height: '56px', borderRadius: '16px', background: 'rgba(122,178,178,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid rgba(122,178,178,0.3)', color: 'var(--color-ocean-primary)' }}>
+                                    <FontAwesomeIcon icon={f.icon} style={{ fontSize: '24px' }} />
                                 </div>
-                            )
-                        })}
+                                <div>
+                                    <h3 style={{ fontSize: '20px', fontWeight: 700, marginBottom: '12px', color: 'var(--color-ocean-text)' }}>{f.title}</h3>
+                                    <p style={{ fontSize: '15px', color: 'var(--color-ocean-text-muted)', lineHeight: 1.6 }}>{f.desc}</p>
+                                </div>
+                            </div>
+                        ))}
                     </div>
                 </div>
             </section>
 
-            {/* CTA */}
-            <section style={{ padding: '80px 24px', borderTop: '1px solid rgba(255,255,255,0.05)', textAlign: 'center' }}>
-                <h2 style={{ fontSize: '28px', fontWeight: 700, marginBottom: '12px' }}>Sẵn sàng tạo logo?</h2>
-                <p style={{ color: 'rgba(255,255,255,0.5)', marginBottom: '32px' }}>Bắt đầu ngay, không cần thẻ tín dụng.</p>
-                <Link to={user ? '/onboarding' : '/register'} className="btn-primary" style={{ padding: '14px 36px', fontSize: '15px' }}>Tạo logo ngay</Link>
+            <section style={{ padding: '100px 24px', textAlign: 'center' }}>
+                <div className="ocean-card" style={{ maxWidth: '800px', margin: '0 auto', padding: '64px 32px', background: 'linear-gradient(135deg, rgba(8,131,149,0.4), rgba(122,178,178,0.2))' }}>
+                    <h2 style={{ fontSize: '36px', fontWeight: 800, marginBottom: '20px' }}>Sẵn sàng đột phá?</h2>
+                    <p style={{ color: 'var(--color-ocean-text-muted)', fontSize: '18px', marginBottom: '40px' }}>Đừng để ý tưởng chỉ nằm trên giấy. Hãy hiện thực hóa ngay hôm nay.</p>
+                    <Link to={user ? '/onboarding' : '/register'} className="btn-ocean" style={{ padding: '16px 48px', fontSize: '18px' }}>Tạo Logo Ai</Link>
+                </div>
             </section>
-
-            {/* Footer */}
-            <footer style={{ borderTop: '1px solid rgba(255,255,255,0.05)', padding: '24px', textAlign: 'center' }}>
-                <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.3)' }}>© 2026 Logo Master. Powered by AI.</p>
-            </footer>
         </div>
     )
 }

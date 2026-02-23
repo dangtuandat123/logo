@@ -17,19 +17,20 @@ export function ToastProvider({ children }) {
 
     const typeStyles = {
         success: { background: 'rgba(34,197,94,0.15)', border: '1px solid rgba(34,197,94,0.3)', color: '#4ade80' },
-        error: { background: 'rgba(239,68,68,0.15)', border: '1px solid rgba(239,68,68,0.3)', color: '#f87171' },
-        info: { background: 'rgba(59,130,246,0.15)', border: '1px solid rgba(59,130,246,0.3)', color: '#60a5fa' },
+        error: { background: 'rgba(239,68,68,0.15)', border: '1px solid rgba(239,68,68,0.3)', color: '#fca5a5' },
+        info: { background: 'rgba(122,178,178,0.15)', border: '1px solid rgba(122,178,178,0.3)', color: 'var(--color-ocean-primary)' },
     }
 
     return (
         <ToastContext.Provider value={{ success, error, info }}>
             {children}
-            <div style={{ position: 'fixed', top: '16px', right: '16px', zIndex: 9999, display: 'flex', flexDirection: 'column', gap: '10px', maxWidth: '360px' }}>
+            <div style={{ position: 'fixed', top: '24px', right: '24px', zIndex: 9999, display: 'flex', flexDirection: 'column', gap: '12px', maxWidth: '380px' }}>
                 {toasts.map(toast => (
                     <div key={toast.id} className="animate-slide-up" style={{
                         ...typeStyles[toast.type],
-                        padding: '12px 20px', borderRadius: '14px', fontSize: '13px', fontWeight: 500,
+                        padding: '16px 24px', borderRadius: '16px', fontSize: '14px', fontWeight: 600,
                         backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)',
+                        boxShadow: '0 8px 32px rgba(9, 99, 126, 0.4)'
                     }}>
                         {toast.message}
                     </div>
