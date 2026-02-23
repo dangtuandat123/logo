@@ -1,0 +1,139 @@
+QUY TRÌNH NGHIỆP VỤ & KIẾN TRÚC APP TẠO LOGO BẰNG AI / SVG
+
+Tài liệu này mô tả vòng đời nghiệp vụ từ lúc người dùng bước vào ứng dụng cho đến khi họ tải xuống sản phẩm cuối cùng, kèm theo cấu trúc hệ thống (các trang và chức năng).
+
+PHẦN 1: QUY TRÌNH NGHIỆP VỤ LÕI (WORKFLOW)
+
+Bước 1: Thu thập Dữ liệu Đầu vào (User Onboarding & Briefing)
+
+Mục tiêu: Lấy "nguyên liệu" (context) để đưa vào Engine tạo logo.
+
+Thông tin cốt lõi:
+
+Tên thương hiệu (Brand Name) - Bắt buộc
+
+Khẩu hiệu (Slogan/Tagline) - Tùy chọn
+
+Định hình phong cách (Preferences):
+
+Ngành nghề (Industry): F&B, Công nghệ, Thời trang, Y tế... (Dùng để filter icon hoặc định hướng prompt).
+
+Phong cách (Style): Minimalist (tối giản), Artisan (thủ công/huy hiệu), Mascot (linh vật), Typography (chữ nghệ thuật).
+
+Bảng màu (Color Palette): Cho phép chọn các tone màu có sẵn (ví dụ: Ấm áp, Lạnh, Sang trọng) hoặc nhập mã Hex.
+
+Bước 2: Engine Tạo Logo (Core Generation)
+
+Đây là "trái tim" của ứng dụng, sử dụng 100% sức mạnh của các mô hình ngôn ngữ lớn (LLM).
+
+Phương pháp: AI LLM & Vector Generation qua OpenRouter
+
+Tích hợp OpenRouter API: Lợi dụng OpenRouter để có thể linh hoạt cấu hình và gọi các LLM mạnh nhất chuyên về coding/SVG (như Claude 3.5 Sonnet, GPT-4o, hoặc các mô hình mã nguồn mở) mà không bị phụ thuộc vào 1 nhà cung cấp duy nhất. Lưu ý: Phải gọi API này từ Backend (PHP) để bảo mật API Key, không gọi trực tiếp từ Frontend (React).
+
+Prompt Engineering: Biến đổi input của user thành System Prompt.
+
+Ví dụ: "Bạn là chuyên gia thiết kế đồ họa. Hãy tạo mã SVG nguyên thủy cho một logo quán cafe, tên là 'A', phong cách Minimalist, màu chủ đạo #XXX..."
+
+Agent Workflow:
+
+Text/Layout Agent: LLM tính toán layout, chọn font chữ phù hợp (Google Fonts).
+
+Graphic Agent: LLM sinh mã <svg> cho biểu tượng trực tiếp dựa trên prompt.
+
+Lưu ý: Vì LLM sinh mã HTML/Tailwind/SVG, Backend (PHP) cần có một bước Parser để kiểm tra và sửa lỗi thẻ đóng/mở (sanitize) trước khi trả kết quả về Frontend.
+
+Bước 3: Trình Chỉnh Sửa & Tương Tác (Web Editor / Canvas)
+
+Người dùng hiếm khi chốt ngay kết quả đầu tiên. Họ cần chỉnh sửa (Toàn bộ bước này diễn ra bằng CSR - Client-Side Rendering trên trình duyệt).
+
+Render (Hiển thị): Đẩy mã HTML/SVG vừa sinh ra vào một khu vực xem trước (Preview Area) trên Frontend.
+
+Layer Management: Parse (phân tích) mã SVG thành một cây DOM có thể thao tác (bằng React).
+
+Phân rã thành các layer: Text "Tên", Text "Slogan", Background, Icon chính, Topping (các chi tiết nhỏ).
+
+Thao tác người dùng (Actions):
+
+Đổi Text & Font: Cập nhật real-time nội dung thẻ <text>.
+
+Đổi màu (Color Picker): Thay đổi thuộc tính fill, stroke của các thẻ <path>, <circle>.
+
+Bố cục (Drag & Drop): Cho phép kéo thả các element. (Sử dụng thư viện như Fabric.js hoặc tự thao tác viewBox/transform).
+
+Bước 4: Trích xuất & Kết xuất (Export & Delivery)
+
+Khi người dùng hài lòng, nghiệp vụ xuất file bắt đầu.
+
+Chuẩn hóa (Sanitize): Dọn dẹp các mã thừa, các class Tailwind phục vụ cho editor, chỉ giữ lại mã thuần túy của logo.
+
+Convert Format (Xử lý tại Client):
+
+SVG: Trả về file .svg gốc (tốt nhất cho in ấn, thiết kế).
+
+PNG/JPG: Dùng HTML5 <canvas> để kết xuất ảnh raster ngay trên trình duyệt mà không cần server Node.js.
+
+Mã nhúng (Embed Code): Xuất nguyên khối mã HTML/Tailwind cho các Web Developer.
+
+Monetization (Nghiệp vụ Kinh doanh qua Private API bằng PHP):
+
+Miễn phí tải bản JPG độ phân giải thấp (có watermark).
+
+Gọi Private API nội bộ để kiểm tra và trừ số dư trong MySQL khi tải bộ Brand Kit (SVG vector, PNG HD).
+
+Bước 5: Lưu trữ & Học máy (Feedback Loop)
+
+Lưu lại lịch sử tạo logo và các lựa chọn cuối cùng của user vào Database (MySQL qua PHP API).
+
+Dùng chính những dữ liệu này để thống kê mẫu prompt nào hiệu quả nhất, từ đó cấu hình lại payload gửi lên OpenRouter.
+
+PHẦN 2: DANH SÁCH CÁC TRANG VÀ CHỨC NĂNG (PAGES & FEATURES)
+
+Để hiện thực hóa quy trình trên, ứng dụng cần được xây dựng với cấu trúc các trang và nhóm chức năng cụ thể như sau:
+
+1. Danh sách các trang (Pages Structure)
+
+Cấu trúc Frontend: Vì triển khai trên hosting cPanel (không có Node.js server), Frontend sẽ sử dụng React theo mô hình SPA (CSR) hoặc Next.js (SSG - Static Export). Mã nguồn sau khi build (npm run build) sẽ là các file tĩnh (HTML/CSS/JS) được đặt trong thư mục public_html của cPanel.
+
+/ (Landing Page): Trang chủ giới thiệu sản phẩm.
+
+/login & /register (Trang Xác thực): Đăng nhập/Đăng ký tài khoản (Gọi API sang PHP Backend).
+
+/onboarding (Trang thu thập yêu cầu): Nơi hiển thị form từng bước (Wizard form) để người dùng chọn ngành nghề, phong cách, màu sắc.
+
+/generating (Trang Loading/Xử lý AI): Màn hình chờ với hiệu ứng (Skeleton hoặc Animation AI đang vẽ). Nơi Frontend đang polling/chờ phản hồi từ PHP Backend.
+
+/editor/:logoId (Trang Workspace/Canvas): Giao diện chính yếu của app. Gồm vùng thiết kế ở giữa, thanh công cụ bên trái và panel thuộc tính bên phải. Render 100% bằng Client-Side.
+
+/pricing & /checkout (Trang Nạp Tiền/Thanh toán): Hiển thị các gói nạp số dư (Credits/Coins).
+
+/dashboard (Trang Quản lý Cá nhân): Nơi user xem lại các logo đã tạo, kiểm tra số dư hiện tại, tải lại file, hoặc nhấn vào để chỉnh sửa tiếp.
+
+2. Các nhóm chức năng lõi (Core Features)
+
+A. Nhóm chức năng AI & Xử lý (AI & Processing):
+
+Prompt Builder: (Tại Frontend) Tự động tổng hợp dữ liệu từ /onboarding thành context chuẩn bị gửi lên server.
+
+OpenRouter Connector: Module Backend viết bằng PHP (Laravel/CodeIgniter) nằm trên cPanel. Chịu trách nhiệm giữ API Keys an toàn, nhận yêu cầu từ React, gọi sang OpenRouter API, quản lý timeout và trả về JSON chứa mã SVG.
+
+SVG Parser & Sanitizer: Chức năng làm sạch mã SVG do AI sinh ra (loại bỏ thẻ rác, đóng thẻ lỗi) có thể xử lý ở cả PHP Backend hoặc React Frontend trước khi render lên UI.
+
+B. Nhóm chức năng Trình soạn thảo (Editor Features - Chạy thuần CSR):
+
+Real-time Preview: Cập nhật UI ngay lập tức khi gõ text hoặc đổi màu.
+
+Layer Control: Ẩn/hiện, thay đổi thứ tự trên dưới (z-index) của các phần tử trong logo.
+
+Undo/Redo (History): Lưu lại state của mỗi lần chỉnh sửa vào Local/Session Storage để người dùng có thể quay lại bước trước đó.
+
+Font Picker: Tích hợp API của Google Fonts để cung cấp hàng trăm lựa chọn typography.
+
+C. Nhóm chức năng Hệ thống (System Features):
+
+Authentication (Xác thực): Hệ thống đăng nhập/đăng ký bằng Tài khoản (Username) và Mật khẩu truyền thống. Xây dựng bằng PHP/MySQL, cấp phát JWT Token cho phiên làm việc của React SPA.
+
+Export Engine: Bộ chuyển đổi định dạng xử lý hoàn toàn bằng Client-Side JS (thư viện như html-to-image hoặc vẽ <svg> lên <canvas>), giúp bypass việc không có Node.js server.
+
+Wallet / Internal Payment API: Viết 1 RESTful API độc lập bằng PHP để xử lý logic thanh toán nội bộ. Cung cấp các endpoint để cộng (khi user nạp), trừ (khi user tải logo), và truy vấn số dư tài khoản của user từ MySQL database.
+
+Cloud Storage: Lưu file logo và dữ liệu user trực tiếp vào thư mục trên hosting cPanel (ví dụ /storage/app/public/logos) thông qua PHP Backend, tiết kiệm chi phí không cần dùng AWS S3.
