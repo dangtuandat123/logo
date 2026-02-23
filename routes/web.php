@@ -6,16 +6,18 @@ use Illuminate\Support\Facades\Route;
 |--------------------------------------------------------------------------
 | Web Routes — Logo Master
 |--------------------------------------------------------------------------
-| - Trang chủ: serve Laravel welcome
-| - /app/{any}: serve React SPA index.html (catch-all cho client-side routing)
+| SPA: React build nằm tại public/build/
+| Mọi request không phải API/asset sẽ trả về SPA index.html
+| để React Router xử lý client-side routing.
 |--------------------------------------------------------------------------
 */
 
-Route::get('/', function () {
-    return view('welcome');
+// SPA fallback: trả về React index.html cho tất cả các route
+// Route API (/api/*) đã được xử lý bởi routes/api.php nên không bị ảnh hưởng
+Route::fallback(function () {
+    $path = public_path('build/index.html');
+    if (!file_exists($path)) {
+        abort(404, 'SPA not built. Run: cd frontend && npm run build');
+    }
+    return response()->file($path, ['Content-Type' => 'text/html']);
 });
-
-// SPA catch-all: mọi route /app/* sẽ trả về React SPA index.html
-Route::get('/app/{any?}', function () {
-    return file_get_contents(public_path('app/index.html'));
-})->where('any', '.*');
