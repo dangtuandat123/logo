@@ -1,53 +1,35 @@
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { useState } from 'react'
+import { Sparkles, LayoutDashboard, Wallet, LogOut, Menu, X } from 'lucide-react'
 
 export default function Navbar() {
     const { user, logout } = useAuth()
     const navigate = useNavigate()
-    const [mobileOpen, setMobileOpen] = useState(false)
-
-    const handleLogout = async () => {
-        await logout()
-        navigate('/login')
-    }
+    const [open, setOpen] = useState(false)
+    const handleLogout = async () => { await logout(); navigate('/login') }
 
     return (
-        <nav style={{ position: 'sticky', top: 0, zIndex: 40, backgroundColor: 'var(--color-surface)', borderBottom: '1px solid var(--color-outline)' }}>
-            <div className="container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: '64px' }}>
-                {/* Logo */}
+        <nav style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 50, background: 'rgba(10,10,15,0.8)', backdropFilter: 'blur(20px) saturate(180%)', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+            <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: '64px' }}>
                 <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: '10px', textDecoration: 'none' }}>
-                    <div style={{ width: '36px', height: '36px', backgroundColor: 'var(--color-primary)', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                        <svg style={{ width: '20px', height: '20px', color: 'white' }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
-                        </svg>
+                    <div style={{ width: '36px', height: '36px', borderRadius: '12px', background: 'linear-gradient(135deg, #3b82f6, #a855f7)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <Sparkles size={18} color="#fff" />
                     </div>
-                    <span style={{ fontSize: '18px', fontWeight: 700, color: 'var(--color-on-surface)' }}>Logo Master</span>
+                    <span style={{ fontSize: '18px', fontWeight: 700, color: 'rgba(255,255,255,0.95)' }}>Logo Master</span>
                 </Link>
-
-                {/* Desktop Nav */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }} className="desktop-nav">
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                     {user ? (
                         <>
-                            <Link to="/onboarding" className="btn-tonal" style={{ padding: '8px 20px', fontSize: '13px' }}>✨ Tạo Logo</Link>
-                            <Link to="/dashboard" style={{ padding: '8px 16px', borderRadius: '9999px', fontSize: '13px', fontWeight: 500, color: 'var(--color-on-surface-variant)', textDecoration: 'none' }}>Dashboard</Link>
-                            <Link to="/pricing" style={{ padding: '8px 16px', borderRadius: '9999px', fontSize: '13px', fontWeight: 500, color: 'var(--color-on-surface-variant)', textDecoration: 'none' }}>Nạp tiền</Link>
-                            <div style={{ width: '1px', height: '24px', backgroundColor: 'var(--color-outline)', margin: '0 8px' }} />
-                            <span className="badge" style={{ backgroundColor: 'var(--color-primary-light)', color: 'var(--color-primary)' }}>
-                                {Number(user.balance || 0).toLocaleString('vi-VN')}đ
-                            </span>
-                            <div style={{ width: '32px', height: '32px', backgroundColor: 'var(--color-primary-surface)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--color-primary)', fontWeight: 600, fontSize: '13px' }}>
-                                {user.name?.charAt(0).toUpperCase()}
-                            </div>
-                            <button onClick={handleLogout} style={{ padding: '8px 16px', borderRadius: '9999px', fontSize: '13px', fontWeight: 500, color: 'var(--color-error)', background: 'none', border: 'none', cursor: 'pointer' }}>
-                                Đăng xuất
-                            </button>
+                            <Link to="/dashboard" className="btn-ghost" style={{ padding: '8px 16px', fontSize: '13px' }}>Dashboard</Link>
+                            <span className="badge" style={{ background: 'rgba(59,130,246,0.15)', color: '#60a5fa' }}>{Number(user.balance || 0).toLocaleString('vi-VN')}đ</span>
+                            <button onClick={handleLogout} className="btn-ghost" style={{ padding: '8px 12px', fontSize: '13px', color: 'rgba(255,255,255,0.4)' }}><LogOut size={16} /></button>
                         </>
                     ) : (
                         <>
-                            <Link to="/pricing" style={{ padding: '8px 16px', borderRadius: '9999px', fontSize: '13px', fontWeight: 500, color: 'var(--color-on-surface-variant)', textDecoration: 'none' }}>Bảng giá</Link>
-                            <Link to="/login" className="btn-tonal" style={{ padding: '8px 24px', fontSize: '13px' }}>Đăng nhập</Link>
-                            <Link to="/register" className="btn-primary" style={{ padding: '8px 24px', fontSize: '13px' }}>Đăng ký</Link>
+                            <Link to="/pricing" className="btn-ghost" style={{ padding: '8px 16px', fontSize: '13px' }}>Bảng giá</Link>
+                            <Link to="/login" className="btn-glass" style={{ padding: '8px 20px', fontSize: '13px' }}>Đăng nhập</Link>
+                            <Link to="/register" className="btn-primary" style={{ padding: '8px 20px', fontSize: '13px' }}>Đăng ký</Link>
                         </>
                     )}
                 </div>

@@ -1,6 +1,7 @@
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { useAuth } from './contexts/AuthContext'
 import Navbar from './components/Navbar'
+import AppLayout from './components/AppLayout'
 import LandingPage from './pages/LandingPage'
 import LoginPage from './pages/LoginPage'
 import RegisterPage from './pages/RegisterPage'
@@ -10,7 +11,6 @@ import EditorPage from './pages/EditorPage'
 import DashboardPage from './pages/DashboardPage'
 import PricingPage from './pages/PricingPage'
 
-// Route bảo vệ — chỉ cho user đã đăng nhập
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuth()
   if (loading) return <PageLoader />
@@ -18,13 +18,12 @@ function ProtectedRoute({ children }) {
   return children
 }
 
-// Skeleton loader toàn trang
 function PageLoader() {
   return (
-    <div className="min-h-screen bg-surface-dim flex items-center justify-center">
-      <div className="flex flex-col items-center gap-4">
-        <div className="w-12 h-12 border-4 border-primary/30 border-t-primary rounded-full animate-spin" />
-        <p className="text-on-surface-variant text-sm font-medium">Đang tải...</p>
+    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--color-dark-950)' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px' }}>
+        <div style={{ width: '48px', height: '48px', border: '3px solid rgba(255,255,255,0.1)', borderTopColor: '#3b82f6', borderRadius: '50%', animation: 'spin 1s linear infinite' }} />
+        <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '14px' }}>Đang tải...</p>
       </div>
     </div>
   )
@@ -32,31 +31,32 @@ function PageLoader() {
 
 export default function App() {
   return (
-    <div className="min-h-screen bg-surface">
-      <Routes>
-        {/* Public routes */}
-        <Route path="/" element={<><Navbar /><LandingPage /></>} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/register" element={<RegisterPage />} />
-        <Route path="/pricing" element={<><Navbar /><PricingPage /></>} />
+    <Routes>
+      {/* Public routes — Navbar + full page */}
+      <Route path="/" element={<><Navbar /><LandingPage /></>} />
+      <Route path="/login" element={<LoginPage />} />
+      <Route path="/register" element={<RegisterPage />} />
 
-        {/* Protected routes */}
-        <Route path="/onboarding" element={
-          <ProtectedRoute><Navbar /><OnboardingPage /></ProtectedRoute>
-        } />
-        <Route path="/generating" element={
-          <ProtectedRoute><GeneratingPage /></ProtectedRoute>
-        } />
-        <Route path="/editor/:id" element={
-          <ProtectedRoute><EditorPage /></ProtectedRoute>
-        } />
-        <Route path="/dashboard" element={
-          <ProtectedRoute><Navbar /><DashboardPage /></ProtectedRoute>
-        } />
+      {/* Protected routes — AppLayout (sidebar) */}
+      <Route path="/onboarding" element={
+        <ProtectedRoute><AppLayout><OnboardingPage /></AppLayout></ProtectedRoute>
+      } />
+      <Route path="/dashboard" element={
+        <ProtectedRoute><AppLayout><DashboardPage /></AppLayout></ProtectedRoute>
+      } />
+      <Route path="/pricing" element={
+        <ProtectedRoute><AppLayout><PricingPage /></AppLayout></ProtectedRoute>
+      } />
 
-        {/* Fallback */}
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
-    </div>
+      {/* Full-screen protected routes (no sidebar) */}
+      <Route path="/generating" element={
+        <ProtectedRoute><GeneratingPage /></ProtectedRoute>
+      } />
+      <Route path="/editor/:id" element={
+        <ProtectedRoute><EditorPage /></ProtectedRoute>
+      } />
+
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
   )
 }
