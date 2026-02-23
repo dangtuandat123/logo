@@ -21,73 +21,66 @@ export default function LoginPage() {
             navigate('/dashboard')
         } catch (err) {
             const data = err.response?.data
-            if (data?.errors) {
-                setErrors(data.errors)
-            } else {
-                toast.error(data?.message || 'Đăng nhập thất bại.')
-            }
+            if (data?.errors) setErrors(data.errors)
+            else toast.error(data?.message || 'Đăng nhập thất bại.')
         } finally {
             setLoading(false)
         }
     }
 
     return (
-        <div className="min-h-screen bg-surface-dim flex items-center justify-center px-4">
-            <div className="w-full max-w-md">
+        <div style={{ minHeight: '100vh', backgroundColor: 'var(--color-surface-dim)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px' }}>
+            <div className="container-sm">
                 {/* Header */}
-                <div className="text-center mb-8">
-                    <Link to="/" className="inline-flex items-center gap-2 mb-6">
-                        <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center">
-                            <svg className="w-6 h-6 text-on-primary" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+                <div style={{ textAlign: 'center', marginBottom: '32px' }}>
+                    <Link to="/" style={{ display: 'inline-flex', alignItems: 'center', gap: '10px', textDecoration: 'none', marginBottom: '24px' }}>
+                        <div style={{ width: '44px', height: '44px', backgroundColor: 'var(--color-primary)', borderRadius: '14px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            <svg style={{ width: '24px', height: '24px', color: 'white' }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
                             </svg>
                         </div>
-                        <span className="text-xl font-bold text-on-surface">Logo Master</span>
+                        <span style={{ fontSize: '20px', fontWeight: 700, color: 'var(--color-on-surface)' }}>Logo Master</span>
                     </Link>
-                    <h1 className="text-2xl font-bold text-on-surface">Đăng nhập</h1>
-                    <p className="text-on-surface-variant mt-1">Chào mừng trở lại! Vui lòng đăng nhập.</p>
+                    <h1 style={{ fontSize: '24px', fontWeight: 700, color: 'var(--color-on-surface)', marginTop: '16px' }}>Đăng nhập</h1>
+                    <p style={{ color: 'var(--color-on-surface-variant)', fontSize: '14px', marginTop: '6px' }}>Chào mừng trở lại! Vui lòng đăng nhập.</p>
                 </div>
 
-                {/* Form */}
-                <div className="bg-surface rounded-3xl border border-outline p-8">
-                    <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+                {/* Form Card */}
+                <div className="card-elevated">
+                    <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
                         <div>
-                            <label className="block text-sm font-medium text-on-surface mb-2">Email</label>
+                            <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: 'var(--color-on-surface)', marginBottom: '8px' }}>Email</label>
                             <input
                                 type="email"
                                 value={form.email}
                                 onChange={e => setForm({ ...form, email: e.target.value })}
-                                className="w-full px-4 py-3 rounded-full bg-surface-container border border-outline text-on-surface text-sm focus:outline-none focus:ring-2 focus:ring-primary placeholder:text-on-surface-variant/50"
+                                className="input-field"
                                 placeholder="email@example.com"
                                 required
                             />
-                            {errors.email && <p className="text-error text-xs mt-1">{errors.email[0]}</p>}
+                            {errors.email && <p style={{ color: 'var(--color-error)', fontSize: '12px', marginTop: '4px' }}>{errors.email[0]}</p>}
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-on-surface mb-2">Mật khẩu</label>
+                            <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: 'var(--color-on-surface)', marginBottom: '8px' }}>Mật khẩu</label>
                             <input
                                 type="password"
                                 value={form.password}
                                 onChange={e => setForm({ ...form, password: e.target.value })}
-                                className="w-full px-4 py-3 rounded-full bg-surface-container border border-outline text-on-surface text-sm focus:outline-none focus:ring-2 focus:ring-primary placeholder:text-on-surface-variant/50"
+                                className="input-field"
                                 placeholder="••••••••"
                                 required
                             />
-                            {errors.password && <p className="text-error text-xs mt-1">{errors.password[0]}</p>}
+                            {errors.password && <p style={{ color: 'var(--color-error)', fontSize: '12px', marginTop: '4px' }}>{errors.password[0]}</p>}
                         </div>
-                        <button
-                            type="submit"
-                            disabled={loading}
-                            className="w-full py-3 rounded-full bg-primary text-on-primary font-semibold text-sm hover:bg-primary-hover transition-colors disabled:opacity-50"
-                        >
+                        <button type="submit" disabled={loading} className="btn-primary" style={{ width: '100%', padding: '14px', marginTop: '4px' }}>
                             {loading ? 'Đang đăng nhập...' : 'Đăng nhập'}
                         </button>
                     </form>
                 </div>
 
-                <p className="text-center text-sm text-on-surface-variant mt-6">
+                <p style={{ textAlign: 'center', fontSize: '14px', color: 'var(--color-on-surface-variant)', marginTop: '24px' }}>
                     Chưa có tài khoản?{' '}
-                    <Link to="/register" className="text-primary font-medium hover:underline">Đăng ký ngay</Link>
+                    <Link to="/register" style={{ color: 'var(--color-primary)', fontWeight: 600, textDecoration: 'none' }}>Đăng ký ngay</Link>
                 </p>
             </div>
         </div>

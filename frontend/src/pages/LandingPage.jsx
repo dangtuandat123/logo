@@ -4,33 +4,36 @@ import { useAuth } from '../contexts/AuthContext'
 export default function LandingPage() {
     const { user } = useAuth()
 
+    const features = [
+        { icon: '⚡', title: 'Nhanh chóng', desc: 'AI tạo logo trong vài giây. Không cần kỹ năng thiết kế.' },
+        { icon: '🎨', title: 'Tùy chỉnh linh hoạt', desc: 'Chỉnh sửa text, màu sắc, font chữ, bố cục ngay trên trình duyệt.' },
+        { icon: '📐', title: 'SVG Vector', desc: 'Xuất file SVG chất lượng vô hạn, sắc nét mọi kích thước.' },
+        { icon: '🎯', title: 'Nhiều phong cách', desc: 'Minimalist, Artisan, Mascot, Typography — đa dạng phong cách.' },
+        { icon: '🔒', title: 'Bảo mật', desc: 'Dữ liệu được lưu trữ an toàn, chỉ bạn có quyền truy cập.' },
+        { icon: '💰', title: 'Giá hợp lý', desc: 'Dùng thử miễn phí. Tải bản HD với giá cực kỳ phải chăng.' },
+    ]
+
     return (
-        <div className="bg-surface">
+        <div>
             {/* Hero Section */}
-            <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 lg:py-32">
-                <div className="text-center max-w-3xl mx-auto">
-                    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary-light text-primary text-sm font-medium mb-8">
-                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
-                        Được hỗ trợ bởi AI
-                    </div>
-                    <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-on-surface leading-tight mb-6">
+            <section style={{ padding: '80px 0 60px' }}>
+                <div className="container" style={{ textAlign: 'center' }}>
+                    <span className="badge" style={{ backgroundColor: 'var(--color-primary-light)', color: 'var(--color-primary)', marginBottom: '24px', display: 'inline-flex' }}>
+                        ⚡ Được hỗ trợ bởi AI
+                    </span>
+                    <h1 style={{ fontSize: 'clamp(32px, 5vw, 56px)', fontWeight: 800, color: 'var(--color-on-surface)', lineHeight: 1.1, marginBottom: '16px' }}>
                         Tạo Logo Chuyên Nghiệp
-                        <span className="text-primary block mt-2">Chỉ Trong Vài Giây</span>
+                        <br />
+                        <span style={{ color: 'var(--color-primary)' }}>Chỉ Trong Vài Giây</span>
                     </h1>
-                    <p className="text-lg text-on-surface-variant max-w-2xl mx-auto mb-10 leading-relaxed">
+                    <p style={{ fontSize: '17px', color: 'var(--color-on-surface-variant)', maxWidth: '560px', margin: '0 auto 32px', lineHeight: 1.7 }}>
                         Sử dụng trí tuệ nhân tạo để thiết kế logo SVG vector chất lượng cao. Tùy chỉnh phong cách, màu sắc, font chữ — tải xuống ngay lập tức.
                     </p>
-                    <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                        <Link
-                            to={user ? '/onboarding' : '/register'}
-                            className="px-8 py-3.5 rounded-full bg-primary text-on-primary text-base font-semibold hover:bg-primary-hover transition-colors"
-                        >
+                    <div style={{ display: 'flex', gap: '16px', justifyContent: 'center', flexWrap: 'wrap' }}>
+                        <Link to={user ? '/onboarding' : '/register'} className="btn-primary" style={{ padding: '14px 36px', fontSize: '15px' }}>
                             Bắt đầu tạo logo miễn phí
                         </Link>
-                        <Link
-                            to="/pricing"
-                            className="px-8 py-3.5 rounded-full bg-surface-container text-on-surface text-base font-semibold hover:bg-outline transition-colors border border-outline"
-                        >
+                        <Link to="/pricing" className="btn-secondary" style={{ padding: '14px 36px', fontSize: '15px' }}>
                             Xem bảng giá
                         </Link>
                     </div>
@@ -38,51 +41,20 @@ export default function LandingPage() {
             </section>
 
             {/* Features Section */}
-            <section className="bg-surface-dim border-t border-outline">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-                    <div className="text-center mb-16">
-                        <h2 className="text-3xl font-bold text-on-surface mb-4">Tại sao chọn Logo Master?</h2>
-                        <p className="text-on-surface-variant max-w-xl mx-auto">Công cụ tạo logo AI mạnh mẽ nhất, xuất file vector SVG chất lượng cao</p>
+            <section style={{ backgroundColor: 'var(--color-surface-dim)', borderTop: '1px solid var(--color-outline)', padding: '80px 0' }}>
+                <div className="container">
+                    <div style={{ textAlign: 'center', marginBottom: '48px' }}>
+                        <h2 style={{ fontSize: '28px', fontWeight: 700, color: 'var(--color-on-surface)', marginBottom: '12px' }}>Tại sao chọn Logo Master?</h2>
+                        <p style={{ color: 'var(--color-on-surface-variant)', maxWidth: '480px', margin: '0 auto' }}>Công cụ tạo logo AI mạnh mẽ nhất, xuất file vector SVG chất lượng cao</p>
                     </div>
-                    <div className="grid md:grid-cols-3 gap-6">
-                        {[
-                            {
-                                icon: '⚡',
-                                title: 'Nhanh chóng',
-                                desc: 'AI tạo logo trong vài giây. Không cần kỹ năng thiết kế.'
-                            },
-                            {
-                                icon: '🎨',
-                                title: 'Tùy chỉnh linh hoạt',
-                                desc: 'Chỉnh sửa text, màu sắc, font chữ, bố cục ngay trên trình duyệt.'
-                            },
-                            {
-                                icon: '📐',
-                                title: 'SVG Vector',
-                                desc: 'Xuất file SVG chất lượng vô hạn, sắc nét mọi kích thước.'
-                            },
-                            {
-                                icon: '🎯',
-                                title: 'Nhiều phong cách',
-                                desc: 'Minimalist, Artisan, Mascot, Typography — đa dạng phong cách.'
-                            },
-                            {
-                                icon: '🔒',
-                                title: 'Bảo mật',
-                                desc: 'Dữ liệu được lưu trữ an toàn, chỉ bạn có quyền truy cập.'
-                            },
-                            {
-                                icon: '💰',
-                                title: 'Giá hợp lý',
-                                desc: 'Dùng thử miễn phí. Tải bản HD với giá cực kỳ phải chăng.'
-                            },
-                        ].map((feature, i) => (
-                            <div key={i} className="bg-surface rounded-3xl border border-outline p-8 hover:border-primary/30 transition-colors">
-                                <div className="w-12 h-12 bg-primary-light rounded-2xl flex items-center justify-center text-2xl mb-5">
-                                    {feature.icon}
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '20px' }}>
+                        {features.map((f, i) => (
+                            <div key={i} className="card" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                                <div style={{ width: '48px', height: '48px', backgroundColor: 'var(--color-primary-light)', borderRadius: '14px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '22px' }}>
+                                    {f.icon}
                                 </div>
-                                <h3 className="text-lg font-semibold text-on-surface mb-2">{feature.title}</h3>
-                                <p className="text-sm text-on-surface-variant leading-relaxed">{feature.desc}</p>
+                                <h3 style={{ fontSize: '16px', fontWeight: 600, color: 'var(--color-on-surface)' }}>{f.title}</h3>
+                                <p style={{ fontSize: '14px', color: 'var(--color-on-surface-variant)', lineHeight: 1.6 }}>{f.desc}</p>
                             </div>
                         ))}
                     </div>
@@ -90,28 +62,23 @@ export default function LandingPage() {
             </section>
 
             {/* CTA Section */}
-            <section className="border-t border-outline">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 text-center">
-                    <h2 className="text-3xl font-bold text-on-surface mb-4">Sẵn sàng tạo logo?</h2>
-                    <p className="text-on-surface-variant mb-8 max-w-lg mx-auto">Bắt đầu ngay với tài khoản miễn phí. Không cần thẻ tín dụng.</p>
-                    <Link
-                        to={user ? '/onboarding' : '/register'}
-                        className="inline-flex px-8 py-3.5 rounded-full bg-primary text-on-primary text-base font-semibold hover:bg-primary-hover transition-colors"
-                    >
+            <section style={{ borderTop: '1px solid var(--color-outline)', padding: '80px 0' }}>
+                <div className="container" style={{ textAlign: 'center' }}>
+                    <h2 style={{ fontSize: '28px', fontWeight: 700, color: 'var(--color-on-surface)', marginBottom: '12px' }}>Sẵn sàng tạo logo?</h2>
+                    <p style={{ color: 'var(--color-on-surface-variant)', marginBottom: '32px', maxWidth: '440px', margin: '0 auto 32px' }}>
+                        Bắt đầu ngay với tài khoản miễn phí. Không cần thẻ tín dụng.
+                    </p>
+                    <Link to={user ? '/onboarding' : '/register'} className="btn-primary" style={{ padding: '14px 36px', fontSize: '15px' }}>
                         Tạo logo ngay
                     </Link>
                 </div>
             </section>
 
             {/* Footer */}
-            <footer className="border-t border-outline bg-surface-dim">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                    <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-                        <p className="text-sm text-on-surface-variant">© 2026 Logo Master. Powered by AI.</p>
-                        <div className="flex gap-6">
-                            <Link to="/pricing" className="text-sm text-on-surface-variant hover:text-primary transition-colors">Bảng giá</Link>
-                        </div>
-                    </div>
+            <footer style={{ borderTop: '1px solid var(--color-outline)', backgroundColor: 'var(--color-surface-dim)', padding: '24px 0' }}>
+                <div className="container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <p style={{ fontSize: '13px', color: 'var(--color-on-surface-variant)' }}>© 2026 Logo Master. Powered by AI.</p>
+                    <Link to="/pricing" style={{ fontSize: '13px', color: 'var(--color-on-surface-variant)', textDecoration: 'none' }}>Bảng giá</Link>
                 </div>
             </footer>
         </div>

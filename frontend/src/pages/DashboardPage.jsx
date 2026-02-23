@@ -12,131 +12,90 @@ export default function DashboardPage() {
     const [transactions, setTransactions] = useState([])
     const [activeTab, setActiveTab] = useState('logos')
 
-    useEffect(() => {
-        loadData()
-    }, [])
+    useEffect(() => { loadData() }, [])
 
     const loadData = async () => {
         try {
-            const [logosRes, txRes] = await Promise.all([
-                api.get('/logos'),
-                api.get('/wallet/transactions'),
-            ])
+            const [logosRes, txRes] = await Promise.all([api.get('/logos'), api.get('/wallet/transactions')])
             setLogos(logosRes.data.data.data || [])
             setTransactions(txRes.data.data.data || [])
             await refreshUser()
-        } catch (err) {
-            toast.error('Lỗi tải dữ liệu.')
-        } finally {
-            setLoading(false)
-        }
+        } catch (err) { toast.error('Lỗi tải dữ liệu.') }
+        finally { setLoading(false) }
     }
 
     const deleteLogo = async (id) => {
         if (!confirm('Bạn có chắc muốn xóa logo này?')) return
-        try {
-            await api.delete(`/logos/${id}`)
-            setLogos(prev => prev.filter(l => l.id !== id))
-            toast.success('Đã xóa logo.')
-        } catch (err) {
-            toast.error('Lỗi khi xóa.')
-        }
+        try { await api.delete(`/logos/${id}`); setLogos(prev => prev.filter(l => l.id !== id)); toast.success('Đã xóa logo.') }
+        catch (err) { toast.error('Lỗi khi xóa.') }
     }
 
+    const tabStyle = (active) => ({
+        padding: '10px 20px', borderRadius: '12px', fontSize: '14px', fontWeight: 500,
+        backgroundColor: active ? 'var(--color-surface)' : 'transparent',
+        border: active ? '1px solid var(--color-outline)' : '1px solid transparent',
+        color: active ? 'var(--color-on-surface)' : 'var(--color-on-surface-variant)',
+        cursor: 'pointer', fontFamily: 'var(--font-sans)', transition: 'all 0.15s ease',
+    })
+
     return (
-        <div className="min-h-screen bg-surface-dim">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div style={{ minHeight: 'calc(100vh - 64px)', backgroundColor: 'var(--color-surface-dim)', padding: '32px 24px' }}>
+            <div className="container">
                 {/* Header */}
-                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
+                <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', gap: '16px', marginBottom: '32px' }}>
                     <div>
-                        <h1 className="text-2xl font-bold text-on-surface">Dashboard</h1>
-                        <p className="text-on-surface-variant text-sm mt-1">Xin chào, {user?.name}!</p>
+                        <h1 style={{ fontSize: '24px', fontWeight: 700 }}>Dashboard</h1>
+                        <p style={{ color: 'var(--color-on-surface-variant)', fontSize: '14px', marginTop: '4px' }}>Xin chào, {user?.name}!</p>
                     </div>
-                    <div className="flex items-center gap-3">
-                        <div className="px-5 py-2.5 rounded-2xl bg-primary-light border border-primary/20">
-                            <span className="text-sm text-on-surface-variant">Số dư: </span>
-                            <span className="text-lg font-bold text-primary">{Number(user?.balance || 0).toLocaleString('vi-VN')}đ</span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                        <div style={{ padding: '10px 20px', borderRadius: '16px', backgroundColor: 'var(--color-primary-light)', border: '1px solid var(--color-primary)', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                            <span style={{ fontSize: '13px', color: 'var(--color-on-surface-variant)' }}>Số dư:</span>
+                            <span style={{ fontSize: '18px', fontWeight: 700, color: 'var(--color-primary)' }}>{Number(user?.balance || 0).toLocaleString('vi-VN')}đ</span>
                         </div>
-                        <Link to="/onboarding" className="px-5 py-2.5 rounded-full bg-primary text-on-primary text-sm font-semibold hover:bg-primary-hover transition-colors">
-                            + Tạo Logo mới
-                        </Link>
+                        <Link to="/onboarding" className="btn-primary" style={{ padding: '10px 24px' }}>+ Tạo Logo mới</Link>
                     </div>
                 </div>
 
                 {/* Tab Switcher */}
-                <div className="flex gap-1 p-1 bg-surface-container rounded-2xl mb-8 w-fit">
-                    {[
-                        { key: 'logos', label: 'Logo của tôi', icon: '🎨' },
-                        { key: 'transactions', label: 'Lịch sử giao dịch', icon: '💰' },
-                    ].map(tab => (
-                        <button
-                            key={tab.key}
-                            onClick={() => setActiveTab(tab.key)}
-                            className={`px-5 py-2.5 rounded-xl text-sm font-medium transition-colors ${activeTab === tab.key ? 'bg-surface text-on-surface border border-outline' : 'text-on-surface-variant hover:text-on-surface'
-                                }`}
-                        >
-                            {tab.icon} {tab.label}
-                        </button>
-                    ))}
+                <div style={{ display: 'inline-flex', gap: '4px', padding: '4px', backgroundColor: 'var(--color-surface-container)', borderRadius: '16px', marginBottom: '32px' }}>
+                    <button onClick={() => setActiveTab('logos')} style={tabStyle(activeTab === 'logos')}>🎨 Logo của tôi</button>
+                    <button onClick={() => setActiveTab('transactions')} style={tabStyle(activeTab === 'transactions')}>💰 Lịch sử giao dịch</button>
                 </div>
 
                 {loading ? (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {[1, 2, 3, 4, 5, 6].map(i => (
-                            <div key={i} className="bg-surface rounded-3xl border border-outline p-4">
-                                <div className="skeleton h-40 mb-4" />
-                                <div className="skeleton h-5 w-3/4 mb-2" />
-                                <div className="skeleton h-4 w-1/2" />
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '20px' }}>
+                        {[1, 2, 3].map(i => (
+                            <div key={i} className="card" style={{ padding: '16px' }}>
+                                <div className="skeleton" style={{ height: '160px', marginBottom: '16px' }} />
+                                <div className="skeleton" style={{ height: '20px', width: '70%', marginBottom: '8px' }} />
+                                <div className="skeleton" style={{ height: '16px', width: '50%' }} />
                             </div>
                         ))}
                     </div>
                 ) : activeTab === 'logos' ? (
-                    /* Logo Grid */
                     logos.length === 0 ? (
-                        <div className="text-center py-20">
-                            <div className="w-20 h-20 mx-auto mb-6 bg-primary-light rounded-3xl flex items-center justify-center text-4xl">🎨</div>
-                            <h3 className="text-lg font-semibold text-on-surface mb-2">Chưa có logo nào</h3>
-                            <p className="text-on-surface-variant text-sm mb-6">Bắt đầu tạo logo đầu tiên của bạn ngay!</p>
-                            <Link to="/onboarding" className="px-6 py-3 rounded-full bg-primary text-on-primary text-sm font-semibold hover:bg-primary-hover transition-colors">
-                                Tạo Logo ngay
-                            </Link>
+                        <div style={{ textAlign: 'center', padding: '80px 24px' }}>
+                            <div style={{ width: '80px', height: '80px', margin: '0 auto 24px', backgroundColor: 'var(--color-primary-light)', borderRadius: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '36px' }}>🎨</div>
+                            <h3 style={{ fontSize: '18px', fontWeight: 600, marginBottom: '8px' }}>Chưa có logo nào</h3>
+                            <p style={{ color: 'var(--color-on-surface-variant)', fontSize: '14px', marginBottom: '24px' }}>Bắt đầu tạo logo đầu tiên của bạn ngay!</p>
+                            <Link to="/onboarding" className="btn-primary">Tạo Logo ngay</Link>
                         </div>
                     ) : (
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '20px' }}>
                             {logos.map(logo => (
-                                <div key={logo.id} className="bg-surface rounded-3xl border border-outline overflow-hidden hover:border-primary/30 transition-colors group">
-                                    {/* SVG Preview */}
-                                    <div className="aspect-[4/3] bg-surface-dim p-6 flex items-center justify-center border-b border-outline">
-                                        <div
-                                            className="w-full h-full [&>svg]:w-full [&>svg]:h-full"
-                                            dangerouslySetInnerHTML={{ __html: logo.svg_content || '<svg></svg>' }}
-                                        />
-                                    </div>
-                                    {/* Info */}
-                                    <div className="p-4">
-                                        <div className="flex items-center justify-between mb-1">
-                                            <h3 className="font-semibold text-on-surface truncate">{logo.name}</h3>
-                                            <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${logo.status === 'completed' ? 'bg-green-50 text-green-700' :
-                                                    logo.status === 'exported' ? 'bg-blue-50 text-blue-700' :
-                                                        'bg-gray-100 text-gray-600'
-                                                }`}>
-                                                {logo.status === 'completed' ? 'Hoàn thành' : logo.status === 'exported' ? 'Đã xuất' : 'Nháp'}
+                                <div key={logo.id} style={{ backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-outline)', borderRadius: '20px', overflow: 'hidden' }}>
+                                    <div style={{ aspectRatio: '4/3', backgroundColor: 'var(--color-surface-dim)', padding: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderBottom: '1px solid var(--color-outline)' }} dangerouslySetInnerHTML={{ __html: logo.svg_content || '<svg></svg>' }} />
+                                    <div style={{ padding: '16px' }}>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                                            <h3 style={{ fontSize: '15px', fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{logo.name}</h3>
+                                            <span className="badge" style={{ backgroundColor: logo.status === 'completed' ? 'var(--color-success-light)' : 'var(--color-surface-container)', color: logo.status === 'completed' ? 'var(--color-success)' : 'var(--color-secondary)', fontSize: '12px', padding: '4px 10px' }}>
+                                                {logo.status === 'completed' ? 'Hoàn thành' : 'Nháp'}
                                             </span>
                                         </div>
-                                        <p className="text-xs text-on-surface-variant mb-3">{logo.industry} · {logo.style}</p>
-                                        <div className="flex gap-2">
-                                            <Link
-                                                to={`/editor/${logo.id}`}
-                                                className="flex-1 text-center px-3 py-2 rounded-full bg-primary-light text-primary text-xs font-medium hover:bg-blue-200 transition-colors"
-                                            >
-                                                ✏️ Chỉnh sửa
-                                            </Link>
-                                            <button
-                                                onClick={() => deleteLogo(logo.id)}
-                                                className="px-3 py-2 rounded-full border border-outline text-error text-xs font-medium hover:bg-red-50 transition-colors"
-                                            >
-                                                🗑️
-                                            </button>
+                                        <p style={{ fontSize: '12px', color: 'var(--color-on-surface-variant)', marginBottom: '12px' }}>{logo.industry} · {logo.style}</p>
+                                        <div style={{ display: 'flex', gap: '8px' }}>
+                                            <Link to={`/editor/${logo.id}`} className="btn-tonal" style={{ flex: 1, padding: '8px', fontSize: '13px', textAlign: 'center' }}>✏️ Chỉnh sửa</Link>
+                                            <button onClick={() => deleteLogo(logo.id)} className="btn-secondary" style={{ padding: '8px 16px', fontSize: '13px', color: 'var(--color-error)', borderColor: 'var(--color-error)' }}>🗑️</button>
                                         </div>
                                     </div>
                                 </div>
@@ -144,40 +103,36 @@ export default function DashboardPage() {
                         </div>
                     )
                 ) : (
-                    /* Transactions Table */
                     transactions.length === 0 ? (
-                        <div className="text-center py-20">
-                            <div className="w-20 h-20 mx-auto mb-6 bg-primary-light rounded-3xl flex items-center justify-center text-4xl">💰</div>
-                            <h3 className="text-lg font-semibold text-on-surface mb-2">Chưa có giao dịch</h3>
-                            <p className="text-on-surface-variant text-sm">Các giao dịch nạp tiền và sử dụng sẽ hiển thị ở đây.</p>
+                        <div style={{ textAlign: 'center', padding: '80px 24px' }}>
+                            <div style={{ width: '80px', height: '80px', margin: '0 auto 24px', backgroundColor: 'var(--color-primary-light)', borderRadius: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '36px' }}>💰</div>
+                            <h3 style={{ fontSize: '18px', fontWeight: 600, marginBottom: '8px' }}>Chưa có giao dịch</h3>
+                            <p style={{ color: 'var(--color-on-surface-variant)', fontSize: '14px' }}>Các giao dịch nạp tiền và sử dụng sẽ hiển thị ở đây.</p>
                         </div>
                     ) : (
-                        <div className="bg-surface rounded-3xl border border-outline overflow-hidden">
-                            <table className="w-full">
+                        <div style={{ backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-outline)', borderRadius: '20px', overflow: 'hidden' }}>
+                            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                                 <thead>
-                                    <tr className="border-b border-outline">
-                                        <th className="text-left px-6 py-4 text-xs font-semibold text-on-surface-variant uppercase">Thời gian</th>
-                                        <th className="text-left px-6 py-4 text-xs font-semibold text-on-surface-variant uppercase">Loại</th>
-                                        <th className="text-left px-6 py-4 text-xs font-semibold text-on-surface-variant uppercase">Mô tả</th>
-                                        <th className="text-right px-6 py-4 text-xs font-semibold text-on-surface-variant uppercase">Số tiền</th>
-                                        <th className="text-right px-6 py-4 text-xs font-semibold text-on-surface-variant uppercase">Số dư</th>
+                                    <tr style={{ borderBottom: '1px solid var(--color-outline)' }}>
+                                        {['Thời gian', 'Loại', 'Mô tả', 'Số tiền', 'Số dư'].map(h => (
+                                            <th key={h} style={{ textAlign: h === 'Số tiền' || h === 'Số dư' ? 'right' : 'left', padding: '14px 20px', fontSize: '12px', fontWeight: 600, color: 'var(--color-on-surface-variant)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{h}</th>
+                                        ))}
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {transactions.map(tx => (
-                                        <tr key={tx.id} className="border-b border-outline last:border-b-0 hover:bg-surface-dim transition-colors">
-                                            <td className="px-6 py-4 text-sm text-on-surface-variant">{new Date(tx.created_at).toLocaleDateString('vi-VN')}</td>
-                                            <td className="px-6 py-4">
-                                                <span className={`px-3 py-1 rounded-full text-xs font-medium ${tx.type === 'deposit' ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'
-                                                    }`}>
+                                        <tr key={tx.id} style={{ borderBottom: '1px solid var(--color-outline)' }}>
+                                            <td style={{ padding: '14px 20px', fontSize: '14px', color: 'var(--color-on-surface-variant)' }}>{new Date(tx.created_at).toLocaleDateString('vi-VN')}</td>
+                                            <td style={{ padding: '14px 20px' }}>
+                                                <span className="badge" style={{ backgroundColor: tx.type === 'deposit' ? 'var(--color-success-light)' : 'var(--color-error-light)', color: tx.type === 'deposit' ? 'var(--color-success)' : 'var(--color-error)', fontSize: '12px', padding: '4px 10px' }}>
                                                     {tx.type === 'deposit' ? '↑ Nạp' : '↓ Trừ'}
                                                 </span>
                                             </td>
-                                            <td className="px-6 py-4 text-sm text-on-surface">{tx.description}</td>
-                                            <td className={`px-6 py-4 text-sm text-right font-semibold ${tx.type === 'deposit' ? 'text-success' : 'text-error'}`}>
+                                            <td style={{ padding: '14px 20px', fontSize: '14px' }}>{tx.description}</td>
+                                            <td style={{ padding: '14px 20px', fontSize: '14px', textAlign: 'right', fontWeight: 600, color: tx.type === 'deposit' ? 'var(--color-success)' : 'var(--color-error)' }}>
                                                 {tx.type === 'deposit' ? '+' : '-'}{Number(tx.amount).toLocaleString('vi-VN')}đ
                                             </td>
-                                            <td className="px-6 py-4 text-sm text-right text-on-surface-variant">{Number(tx.balance_after).toLocaleString('vi-VN')}đ</td>
+                                            <td style={{ padding: '14px 20px', fontSize: '14px', textAlign: 'right', color: 'var(--color-on-surface-variant)' }}>{Number(tx.balance_after).toLocaleString('vi-VN')}đ</td>
                                         </tr>
                                     ))}
                                 </tbody>

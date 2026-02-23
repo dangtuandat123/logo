@@ -5,27 +5,15 @@ import { useNavigate } from 'react-router-dom'
 import api from '../services/api'
 
 const PLANS = [
-    {
-        name: 'Starter',
-        price: 50000,
-        credits: '50.000đ',
-        features: ['5 lần tạo logo AI', 'Tải SVG miễn phí', 'Chỉnh sửa không giới hạn'],
-        popular: false,
-    },
-    {
-        name: 'Pro',
-        price: 150000,
-        credits: '150.000đ',
-        features: ['20 lần tạo logo AI', 'Tải SVG + PNG HD', 'Ưu tiên xử lý AI', 'Hỗ trợ nhanh'],
-        popular: true,
-    },
-    {
-        name: 'Business',
-        price: 500000,
-        credits: '500.000đ',
-        features: ['100 lần tạo logo AI', 'Tải tất cả định dạng', 'Ưu tiên cao nhất', 'Brand Kit đầy đủ', 'Hỗ trợ 24/7'],
-        popular: false,
-    },
+    { name: 'Starter', price: 50000, credits: '50.000đ', features: ['5 lần tạo logo AI', 'Tải SVG miễn phí', 'Chỉnh sửa không giới hạn'], popular: false },
+    { name: 'Pro', price: 150000, credits: '150.000đ', features: ['20 lần tạo logo AI', 'Tải SVG + PNG HD', 'Ưu tiên xử lý AI', 'Hỗ trợ nhanh'], popular: true },
+    { name: 'Business', price: 500000, credits: '500.000đ', features: ['100 lần tạo logo AI', 'Tải tất cả định dạng', 'Ưu tiên cao nhất', 'Brand Kit đầy đủ', 'Hỗ trợ 24/7'], popular: false },
+]
+
+const FAQS = [
+    { q: 'Tôi có thể dùng thử miễn phí không?', a: 'Có! Mỗi tài khoản mới được tặng số dư dùng thử để tạo logo đầu tiên.' },
+    { q: 'Logo có bị watermark không?', a: 'Bản xem trước miễn phí. Tải file SVG/PNG HD yêu cầu có số dư tài khoản.' },
+    { q: 'Tôi có quyền sở hữu logo không?', a: 'Hoàn toàn. Tất cả logo bạn tạo đều thuộc quyền sở hữu của bạn.' },
 ]
 
 export default function PricingPage() {
@@ -35,17 +23,10 @@ export default function PricingPage() {
     const [loadingPlan, setLoadingPlan] = useState(null)
 
     const handleDeposit = async (plan) => {
-        if (!user) {
-            navigate('/register')
-            return
-        }
-
+        if (!user) { navigate('/register'); return }
         setLoadingPlan(plan.name)
         try {
-            await api.post('/wallet/deposit', {
-                amount: plan.price,
-                description: `Nạp gói ${plan.name}`,
-            })
+            await api.post('/wallet/deposit', { amount: plan.price, description: `Nạp gói ${plan.name}` })
             await refreshUser()
             toast.success(`Đã nạp ${plan.credits} vào tài khoản!`)
             navigate('/dashboard')
@@ -57,37 +38,43 @@ export default function PricingPage() {
     }
 
     return (
-        <div className="min-h-screen bg-surface-dim">
-            <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <div style={{ minHeight: 'calc(100vh - 64px)', backgroundColor: 'var(--color-surface-dim)', padding: '64px 24px' }}>
+            <div className="container" style={{ maxWidth: '960px' }}>
                 {/* Header */}
-                <div className="text-center mb-12">
-                    <h1 className="text-3xl font-bold text-on-surface mb-3">Bảng giá</h1>
-                    <p className="text-on-surface-variant max-w-xl mx-auto">Nạp tiền vào ví để sử dụng các tính năng AI tạo logo và tải file chất lượng cao.</p>
+                <div style={{ textAlign: 'center', marginBottom: '48px' }}>
+                    <h1 style={{ fontSize: '32px', fontWeight: 700, marginBottom: '12px' }}>Bảng giá</h1>
+                    <p style={{ color: 'var(--color-on-surface-variant)', maxWidth: '480px', margin: '0 auto', fontSize: '15px' }}>
+                        Nạp tiền vào ví để sử dụng các tính năng AI tạo logo và tải file chất lượng cao.
+                    </p>
                 </div>
 
-                {/* Pricing Cards */}
-                <div className="grid md:grid-cols-3 gap-6">
+                {/* Cards */}
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '20px', marginBottom: '64px' }}>
                     {PLANS.map(plan => (
-                        <div
-                            key={plan.name}
-                            className={`rounded-3xl border p-8 flex flex-col relative ${plan.popular
-                                    ? 'bg-surface border-primary'
-                                    : 'bg-surface border-outline'
-                                }`}
-                        >
+                        <div key={plan.name} style={{
+                            backgroundColor: 'var(--color-surface)',
+                            border: `1.5px solid ${plan.popular ? 'var(--color-primary)' : 'var(--color-outline)'}`,
+                            borderRadius: '24px',
+                            padding: '32px',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            position: 'relative',
+                        }}>
                             {plan.popular && (
-                                <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-primary text-on-primary text-xs font-semibold">
+                                <span style={{
+                                    position: 'absolute', top: '-12px', left: '50%', transform: 'translateX(-50%)',
+                                    padding: '4px 16px', borderRadius: '9999px', backgroundColor: 'var(--color-primary)',
+                                    color: 'white', fontSize: '12px', fontWeight: 600, whiteSpace: 'nowrap',
+                                }}>
                                     Phổ biến nhất
-                                </div>
+                                </span>
                             )}
-                            <h3 className="text-lg font-bold text-on-surface mb-1">{plan.name}</h3>
-                            <div className="mb-6">
-                                <span className="text-3xl font-bold text-primary">{plan.credits}</span>
-                            </div>
-                            <ul className="flex flex-col gap-3 mb-8 flex-1">
+                            <h3 style={{ fontSize: '18px', fontWeight: 700, marginBottom: '4px' }}>{plan.name}</h3>
+                            <div style={{ fontSize: '32px', fontWeight: 800, color: 'var(--color-primary)', marginBottom: '24px' }}>{plan.credits}</div>
+                            <ul style={{ listStyle: 'none', padding: 0, display: 'flex', flexDirection: 'column', gap: '14px', flex: 1, marginBottom: '28px' }}>
                                 {plan.features.map((f, i) => (
-                                    <li key={i} className="flex items-start gap-2 text-sm text-on-surface-variant">
-                                        <svg className="w-5 h-5 text-success flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 24 24">
+                                    <li key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', fontSize: '14px', color: 'var(--color-on-surface-variant)' }}>
+                                        <svg style={{ width: '20px', height: '20px', color: 'var(--color-success)', flexShrink: 0, marginTop: '1px' }} fill="currentColor" viewBox="0 0 24 24">
                                             <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z" />
                                         </svg>
                                         {f}
@@ -97,10 +84,8 @@ export default function PricingPage() {
                             <button
                                 onClick={() => handleDeposit(plan)}
                                 disabled={loadingPlan === plan.name}
-                                className={`w-full py-3 rounded-full font-semibold text-sm transition-colors disabled:opacity-50 ${plan.popular
-                                        ? 'bg-primary text-on-primary hover:bg-primary-hover'
-                                        : 'bg-primary-light text-primary hover:bg-blue-200'
-                                    }`}
+                                className={plan.popular ? 'btn-primary' : 'btn-tonal'}
+                                style={{ width: '100%', padding: '14px' }}
                             >
                                 {loadingPlan === plan.name ? 'Đang xử lý...' : 'Nạp ngay'}
                             </button>
@@ -109,17 +94,13 @@ export default function PricingPage() {
                 </div>
 
                 {/* FAQ */}
-                <div className="mt-16">
-                    <h2 className="text-xl font-bold text-on-surface text-center mb-8">Câu hỏi thường gặp</h2>
-                    <div className="max-w-2xl mx-auto flex flex-col gap-4">
-                        {[
-                            { q: 'Tôi có thể dùng thử miễn phí không?', a: 'Có! Mỗi tài khoản mới được tặng số dư dùng thử để tạo logo đầu tiên.' },
-                            { q: 'Logo có bị watermark không?', a: 'Bản xem trước miễn phí. Tải file SVG/PNG HD yêu cầu có số dư tài khoản.' },
-                            { q: 'Tôi có quyền sở hữu logo không?', a: 'Hoàn toàn. Tất cả logo bạn tạo đều thuộc quyền sở hữu của bạn.' },
-                        ].map((faq, i) => (
-                            <div key={i} className="bg-surface rounded-2xl border border-outline p-6">
-                                <h3 className="font-semibold text-on-surface mb-2">{faq.q}</h3>
-                                <p className="text-sm text-on-surface-variant">{faq.a}</p>
+                <div style={{ maxWidth: '640px', margin: '0 auto' }}>
+                    <h2 style={{ fontSize: '22px', fontWeight: 700, textAlign: 'center', marginBottom: '24px' }}>Câu hỏi thường gặp</h2>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                        {FAQS.map((faq, i) => (
+                            <div key={i} className="card">
+                                <h3 style={{ fontSize: '15px', fontWeight: 600, marginBottom: '8px' }}>{faq.q}</h3>
+                                <p style={{ fontSize: '14px', color: 'var(--color-on-surface-variant)', lineHeight: 1.6 }}>{faq.a}</p>
                             </div>
                         ))}
                     </div>

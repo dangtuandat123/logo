@@ -3,29 +3,44 @@
 
 /* === Material You — White Theme Design Tokens === */
 @theme {
-  --color-primary: #2563EB;
-  --color-primary-hover: #1D4ED8;
-  --color-primary-light: #DBEAFE;
-  --color-primary-surface: #EFF6FF;
-  --color-on-primary: #FFFFFF;
-  --color-secondary: #64748B;
-  --color-surface: #FFFFFF;
-  --color-surface-dim: #F8FAFC;
-  --color-surface-container: #F1F5F9;
-  --color-outline: #E2E8F0;
-  --color-on-surface: #0F172A;
-  --color-on-surface-variant: #475569;
-  --color-error: #DC2626;
-  --color-success: #16A34A;
-  --color-warning: #D97706;
+  --color-primary: #1a73e8;
+  --color-primary-hover: #1557b0;
+  --color-primary-light: #d2e3fc;
+  --color-primary-surface: #e8f0fe;
+  --color-on-primary: #ffffff;
+  --color-secondary: #5f6368;
+  --color-surface: #ffffff;
+  --color-surface-dim: #f8f9fa;
+  --color-surface-container: #f1f3f4;
+  --color-surface-container-high: #e8eaed;
+  --color-outline: #dadce0;
+  --color-outline-variant: #c4c7c5;
+  --color-on-surface: #1f1f1f;
+  --color-on-surface-variant: #444746;
+  --color-error: #d93025;
+  --color-error-light: #fce8e6;
+  --color-success: #1e8e3e;
+  --color-success-light: #e6f4ea;
+  --color-warning: #f9ab00;
   --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 28px;
+  --radius-full: 9999px;
 }
 
-/* === Base Resets === */
-* {
+/* === Base Reset === */
+*,
+*::before,
+*::after {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
@@ -34,12 +49,151 @@ body {
   color: var(--color-on-surface);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  line-height: 1.6;
+  font-size: 16px;
 }
 
-/* === Material You: No shadows, no blur, no gradients === */
-/* Tonal Elevation via background color changes */
+/* === Material You Button Base === */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 32px;
+  border-radius: var(--radius-full);
+  background-color: var(--color-primary);
+  color: var(--color-on-primary);
+  font-weight: 600;
+  font-size: 14px;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+  text-decoration: none;
+  line-height: 1.4;
+}
 
-/* === Scrollbar Styling === */
+.btn-primary:hover {
+  background-color: var(--color-primary-hover);
+}
+
+.btn-primary:active {
+  transform: scale(0.98);
+}
+
+.btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 32px;
+  border-radius: var(--radius-full);
+  background-color: var(--color-surface);
+  color: var(--color-primary);
+  font-weight: 600;
+  font-size: 14px;
+  border: 1px solid var(--color-outline);
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  text-decoration: none;
+  line-height: 1.4;
+}
+
+.btn-secondary:hover {
+  background-color: var(--color-surface-dim);
+}
+
+.btn-tonal {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 32px;
+  border-radius: var(--radius-full);
+  background-color: var(--color-primary-light);
+  color: var(--color-primary);
+  font-weight: 600;
+  font-size: 14px;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  text-decoration: none;
+  line-height: 1.4;
+}
+
+.btn-tonal:hover {
+  background-color: #c2d9f7;
+}
+
+/* === Material You Input === */
+.input-field {
+  width: 100%;
+  padding: 14px 20px;
+  border-radius: var(--radius-xl);
+  background-color: var(--color-surface-dim);
+  border: 1px solid var(--color-outline);
+  color: var(--color-on-surface);
+  font-size: 14px;
+  font-family: var(--font-sans);
+  transition: border-color 0.2s ease;
+  outline: none;
+}
+
+.input-field:focus {
+  border-color: var(--color-primary);
+  background-color: var(--color-surface);
+}
+
+.input-field::placeholder {
+  color: var(--color-secondary);
+  opacity: 0.6;
+}
+
+/* === Material You Card === */
+.card {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-outline);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+}
+
+.card-elevated {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-outline);
+  border-radius: 24px;
+  padding: 32px;
+}
+
+/* === Container === */
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 24px;
+  padding-right: 24px;
+}
+
+.container-sm {
+  width: 100%;
+  max-width: 480px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 24px;
+  padding-right: 24px;
+}
+
+.container-md {
+  width: 100%;
+  max-width: 720px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 24px;
+  padding-right: 24px;
+}
+
+/* === Scrollbar === */
 ::-webkit-scrollbar {
   width: 6px;
 }
@@ -53,10 +207,10 @@ body {
   border-radius: 9999px;
 }
 
-/* === Toast/Notification Animation === */
+/* === Animations === */
 @keyframes slide-in {
   from {
-    transform: translateY(-100%);
+    transform: translateY(-16px);
     opacity: 0;
   }
 
@@ -66,13 +220,26 @@ body {
   }
 }
 
-@keyframes fade-out {
+@keyframes fade-in {
   from {
-    opacity: 1;
+    opacity: 0;
   }
 
   to {
-    opacity: 0;
+    opacity: 1;
+  }
+}
+
+@keyframes bounce-dot {
+
+  0%,
+  80%,
+  100% {
+    transform: scale(0);
+  }
+
+  40% {
+    transform: scale(1);
   }
 }
 
@@ -80,11 +247,18 @@ body {
   animation: slide-in 0.3s ease-out;
 }
 
-.animate-fade-out {
-  animation: fade-out 0.3s ease-in forwards;
+.animate-fade-in {
+  animation: fade-in 0.4s ease-out;
 }
 
-/* === Skeleton Loading Animation === */
+/* === Skeleton Loading === */
+.skeleton {
+  background: linear-gradient(90deg, var(--color-surface-container) 25%, var(--color-surface-container-high) 50%, var(--color-surface-container) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: var(--radius-md);
+}
+
 @keyframes shimmer {
   0% {
     background-position: -200% 0;
@@ -95,9 +269,20 @@ body {
   }
 }
 
-.skeleton {
-  background: linear-gradient(90deg, #F1F5F9 25%, #E2E8F0 50%, #F1F5F9 75%);
-  background-size: 200% 100%;
-  animation: shimmer 1.5s infinite;
-  border-radius: 8px;
+/* === Badge === */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 16px;
+  border-radius: var(--radius-full);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+/* === Spinner === */
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
